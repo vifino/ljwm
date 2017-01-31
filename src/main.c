@@ -21,7 +21,7 @@ int lua_require(lua_State* L, char* libname) {
 
 int main(int argc, char *argv[]) {
 	lua_State* L = luaL_newstate();
-	if (!L)
+	if (L == NULL)
 		bailout(1, "Unable to initialize LuaJIT! This is _BAD_!");
 
 	// Continue state initialization as usual.
