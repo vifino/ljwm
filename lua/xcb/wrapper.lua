@@ -10,6 +10,7 @@ local wrappers = {
 	"connection",
 	"setup",
 	"window",
+	"window_attributes",
 	"get_input_focus",
 }
 for i=1, #wrappers do

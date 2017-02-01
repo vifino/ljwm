@@ -20,6 +20,7 @@ local index = {
 	destroy_subwindows_checked = function(self, conn)
 		return xcbr.xcb_destroy_subwindows_checked(conn, self)
 	end,
+
 	--- Reparrent the window
 	reparent = function(self, conn, parent, x, y)
 		return xcbr.xcb_reparent_window(conn, self, parent, x, y)
@@ -27,6 +28,7 @@ local index = {
 	reparent_checked = function(self, conn, parent, x, y)
 		return xcbr.xcb_reparent_window_checked(conn, self, parent, x, y)
 	end,
+
 	--- Show the window.
 	map = function(self, conn)
 		return xcbr.xcb_map_window(conn, self)
@@ -41,6 +43,7 @@ local index = {
 	map_subwindows_checked = function(self, conn)
 		return xcbr.xcb_map_subwindows_checked(conn, self)
 	end,
+
 	--- Hide the window.
 	unmap = function(self, conn)
 		return xcbr.xcb_unmap_window(conn, self)
@@ -54,6 +57,14 @@ local index = {
 	end,
 	unmap_subwindows_checked = function(self, conn)
 		return xcbr.xcb_unmap_subwindows_checked(conn, self)
+	end,
+
+	--- Get window attributes.
+	get_attributes = function(self, conn)
+		return xcbr.xcb_get_window_attributes(conn, self)
+	end,
+	get_attributes_unchecked = function(self, conn)
+		return xcbr.xcb_get_window_attributes_unchecked(conn, self)
 	end,
 }
 
