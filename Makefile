@@ -20,7 +20,7 @@ LJCFLAGS ?= $(shell pkg-config --cflags luajit)
 LUAFILES = $(shell find lua -type f -name '*.lua')
 LUAOBJECTS = $(LUAFILES:%.lua=%.o)
 
-XCBINCLUDE = /usr/include/xcb/
+XCBINCLUDE = $(shell pkg-config --variable=includedir xcb)/xcb/
 
 ##
 # Targets
