@@ -3,9 +3,25 @@
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 
+-- Helpers
+local function fmtwid(wid)
+	return string.format("0x%08x", wid)
+end
+
+-- vars
+local xcb_window_t = ffi.typeof("xcb_window_t")
+local xcb_window_t_ptr = ffi.typeof("xcb_window_t*")
+local xcb_window_t_ptr_ptr = ffi.typeof("xcb_window_t**")
+local t_wid_size = ffi.sizeof(xcb_window_t)
+local c_window
+
 -- TODO: Configuring
 
 local index = {
+	--- Get WID in string format.
+	fmt = function(self)
+		return fmtwid(self.wid)
+	end,
 	--- Destroy the window.
 	destroy = function(self)
 		return xcbr.xcb_destroy_window(self.conn, self.wid)
@@ -66,17 +82,37 @@ local index = {
 	get_attributes_unchecked = function(self)
 		return xcbr.xcb_get_window_attributes_unchecked(self.conn, self.wid)
 	end,
+
+	--- Get Children of a window.
+	-- This method is sadly complicated.
+	children = function(self)
+		local reply = xcbr.xcb_query_tree(self.conn, self.wid):reply(self.conn)
+		if not reply then
+			error("window: no such window "..fmtwid(self.wid))
+		end
+		local num_childs = reply.children_len
+		local list = ffi.C.malloc(t_wid_size * num_childs)
+		ffi.copy(list, xcbr.xcb_query_tree_children(reply), t_wid_size * num_childs)
+		list = ffi.cast(xcb_window_t_ptr, list)
+
+		local res = {}
+		for i=1, num_childs do
+			local child = list[i-1]
+			res[i] = c_window(self.conn, tonumber(child))
+		end
+		return res
+	end,
 }
 
 local mt = {
 	__index=index,
 	__tostring = function(self)
-		return "<window "..io.format("0x%08x", self.wid)..">"
+		return "<window "..fmtwid(self.wid)..">"
 	end,
 }
 
 --- Constructor for a window object given a WID.
-return function(conn, wid)
+c_window = function(conn, wid)
 	local window = {
 		["wid"] = wid,
 		["conn"] = conn,
@@ -84,3 +120,5 @@ return function(conn, wid)
 	setmetatable(window, mt)
 	return window
 end
+
+return c_window

@@ -28,11 +28,11 @@ all: $(OUTFILE)
 # Compile Lua scripts to objects
 %.o: %.lua
 	@echo LJDUMP	$(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g'):	$< -\> $@
-	@$(LJBIN) -b -n $(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g') $< $@
+	@$(LJBIN) -b -g -n $(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g') $< $@
 
 src/boot.o: $(BOOTSCRIPT)
 	@echo LJDUMP	ljwm.bootscript:	$(BOOTSCRIPT) -\> src/boot.o
-	@$(LJBIN) -b -n ljwm.bootscript ${BOOTSCRIPT} src/boot.o
+	@$(LJBIN) -b -g -n ljwm.bootscript ${BOOTSCRIPT} src/boot.o
 
 # Main bin, Bootscript and shtuff.
 $(OUTFILE): src/main.c src/boot.o $(LUAOBJECTS)

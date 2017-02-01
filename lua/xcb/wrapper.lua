@@ -13,6 +13,7 @@ local wrappers = {
 	"window",
 	"window_attributes",
 	"get_input_focus",
+	"query_tree",
 	"iterator",
 }
 for i=1, #wrappers do
