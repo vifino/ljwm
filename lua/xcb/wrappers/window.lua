@@ -72,4 +72,5 @@ local index = {
 return function(conn, wid)
 	setmetatable(wid, {__index=index})
 	wid.conn = conn
+	return wid
 end
