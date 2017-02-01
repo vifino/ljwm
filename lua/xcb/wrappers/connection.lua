@@ -11,7 +11,11 @@ local fns_conn = {
 		end
 	end,
 	--- Flushes stuff.
-	flush = function(self)
+	-- @param sync Forces syncronous flush instead of async one.
+	flush = function(self, sync)
+		if sync then
+			return xcb.xcb_aux_flush(conn)
+		end
 		return xcbr.xcb_flush(conn)
 	end,
 	--- Checks if the connection has an error.
@@ -32,11 +36,24 @@ local fns_conn = {
 		return xcbr.xcb_get_setup(self)
 	end,
 
+	--- Get the input focus.
 	get_input_focus = function(self)
 		return xcbr.xcb_get_input_focus(self)
 	end,
 	get_input_focus_unchecked = function(self)
 		return xcbr.xcb_get_input_focus_unchecked(self)
+	end,
+
+	--- Wait for an event.
+	wait_for_event = function(self)
+		local event = xcbr.xcb_wait_for_event(self)
+		if event ~= nil then ffi.gc(event, ffi.C.free) end
+		return event
+	end,
+	poll_for_event = function(self)
+		local event = xcbr.xcb_poll_for_event(self)
+		if event ~= nil then ffi.gc(event, ffi.C.free) end
+		return event
 	end,
 }
 ffi.metatype("xcb_connection_t", {__index=fns_conn})
