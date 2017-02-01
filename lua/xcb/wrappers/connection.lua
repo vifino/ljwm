@@ -3,11 +3,13 @@
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 
+local c_window = require("xcb.wrappers.window")
+
 local fns_conn = {
 	--- Disconnects the XCB connection.
 	disconnect = function(self)
-		if self.conn then
-			xcbr.xcb_disconnect(ffi.gc(self.conn, nil))
+		if self then
+			xcbr.xcb_disconnect(ffi.gc(self, nil))
 		end
 	end,
 	--- Flushes stuff.
@@ -20,7 +22,7 @@ local fns_conn = {
 	end,
 	--- Checks if the connection has an error.
 	has_error = function(self)
-		return xcbr.xcb_connection_has_error(self.conn) ~= 0
+		return xcbr.xcb_connection_has_error(self) ~= 0
 	end,
 	--- Generate an ID.
 	generate_id = function(self)
@@ -54,6 +56,11 @@ local fns_conn = {
 		local event = xcbr.xcb_poll_for_event(self)
 		if event ~= nil then ffi.gc(event, ffi.C.free) end
 		return event
+	end,
+
+	--- Window object constructor for current connection.
+	window = function(self, wid)
+		return c_window(self, wid)
 	end,
 }
 ffi.metatype("xcb_connection_t", {__index=fns_conn})

@@ -1,7 +1,7 @@
 --- Wrapper for XCB $NAME
 
 local ffi = require("ffi")
-local xcbr = require("xcbr")
+local xcbr = require("xcb.raw")
 
 local index = {
 
