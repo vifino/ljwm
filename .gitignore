@@ -1,3 +1,4 @@
 # Stuff
 *.o
 /ljwm
+/lua/xcb/ffi_cdefs.lua

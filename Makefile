@@ -20,14 +20,20 @@ LJCFLAGS ?= $(shell pkg-config --cflags luajit)
 LUAFILES = $(shell find lua -type f -name '*.lua')
 LUAOBJECTS = $(LUAFILES:%.lua=%.o)
 
+XCBINCLUDE = /usr/include/xcb/
+
 ##
 # Targets
 ##
 
 all: $(OUTFILE)
 
+# Generate CDefs
+lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h
+	$(CC) -E $(XCBINCLUDE)xproto.h | $(LJBIN) tools/pulldefs.lua $(XCBINCLUDE) > lua/xcb/ffi_cdefs.lua
+
 # Compile Lua scripts to objects
-%.o: %.lua
+%.o: %.lua lua/xcb/ffi_cdefs.lua
 	@echo LJDUMP	$(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g'):	$< -\> $@
 	@$(LJBIN) -b -g -n $(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g') $< $@
 
