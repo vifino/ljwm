@@ -15,6 +15,7 @@ LIBS ?= -lm -ldl $(shell pkg-config --libs xcb xcb-util)
 
 LJBIN ?= luajit
 LJLIB ?= $(shell pkg-config --libs luajit)
+LJCFLAGS ?= $(shell pkg-config --cflags luajit)
 
 LUAFILES = $(shell find lua -type f -name '*.lua')
 LUAOBJECTS = $(LUAFILES:%.lua=%.o)
@@ -36,7 +37,7 @@ src/boot.o: $(BOOTSCRIPT)
 
 # Main bin, Bootscript and shtuff.
 $(OUTFILE): src/main.c src/boot.o $(LUAOBJECTS)
-	$(CC) -o $(OUTFILE) $(CFLAGS) ${LDFLAGS} -Wl,-E src/main.c src/boot.o $(LUAOBJECTS) $(LJLIB) $(LIBS)
+	$(CC) -o $(OUTFILE) $(CFLAGS) ${LDFLAGS} $(LJCFLAGS) -Wl,-E src/main.c src/boot.o $(LUAOBJECTS) $(LJLIB) $(LIBS)
 
 # Clean
 clean:
