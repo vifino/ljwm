@@ -13,7 +13,7 @@ local wrappers = {
 	"window",
 	"window_attributes",
 	"get_input_focus",
-	"iterators",
+	"iterator",
 }
 for i=1, #wrappers do
 	local wrapper = wrappers[i]

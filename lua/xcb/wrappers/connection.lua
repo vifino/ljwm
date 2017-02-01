@@ -1,4 +1,5 @@
 --- Wrappers around a XCB connection.
+-- This is the main thing.
 
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
