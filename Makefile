@@ -29,7 +29,7 @@ XCBINCLUDE = /usr/include/xcb/
 all: $(OUTFILE)
 
 # Generate CDefs
-lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h
+lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h tools/pulldefs.lua
 	$(CC) -E $(XCBINCLUDE)xproto.h | $(LJBIN) tools/pulldefs.lua $(XCBINCLUDE) > lua/xcb/ffi_cdefs.lua
 
 # Compile Lua scripts to objects
