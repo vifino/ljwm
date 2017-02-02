@@ -88,7 +88,7 @@ local index = {
 	-- This method is sadly complicated.
 	children = function(self)
 		local reply = xcbr.xcb_query_tree(self.conn, self.wid):reply(self.conn)
-		if not reply then
+		if reply == nil then
 			error("window: no such window "..fmtwid(self.wid))
 		end
 		local num_childs = reply.children_len
@@ -124,5 +124,8 @@ c_window = function(conn, wid)
 	setmetatable(window, mt)
 	return window
 end
+
+-- Stack trace info
+STP.add_known_function(c_window, "xcb.wrappers.window constructor")
 
 return c_window

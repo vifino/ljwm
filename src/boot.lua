@@ -15,7 +15,7 @@ if err then
 	print("Compilation error: "..err)
 end
 
-local success, err = xpcall(f, debug.traceback)
+local success, err = xpcall(f, STP.stacktrace)
 if not success then
-	print(err)
+	io.write(err)
 end

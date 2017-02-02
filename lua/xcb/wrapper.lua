@@ -44,4 +44,7 @@ for i=1, #wrappers do
 	api[wrapper] = require("xcb.wrappers."..wrapper)
 end
 
+-- Stack traces.
+STP.add_known_table(api, "xcb.wrapper library")
+
 return api

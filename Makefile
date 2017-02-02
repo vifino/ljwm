@@ -43,7 +43,7 @@ src/boot.o: $(BOOTSCRIPT)
 
 # Main bin, Bootscript and shtuff.
 $(OUTFILE): src/main.c src/boot.o $(LUAOBJECTS)
-	$(CC) -o $(OUTFILE) $(CFLAGS) ${LDFLAGS} $(LJCFLAGS) -Wl,-E src/main.c src/boot.o $(LUAOBJECTS) $(LJLIB) $(LIBS)
+	$(CC) -std=gnu99 -o $(OUTFILE) $(CFLAGS) ${LDFLAGS} $(LJCFLAGS) -Wl,-E src/main.c src/boot.o $(LUAOBJECTS) $(LJLIB) $(LIBS)
 
 # Clean
 clean:

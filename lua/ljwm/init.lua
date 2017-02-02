@@ -8,3 +8,7 @@ ffi.cdef [[
 void free(void*);
 void *malloc(size_t size);
 ]]
+
+-- Better stack traces.
+STP = require("StackTracePlus")
+debug.traceback = STP.stacktrace

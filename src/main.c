@@ -13,10 +13,16 @@ void bailout(int status, const char* msg) {
 	exit(status);
 }
 
-int lua_require(lua_State* L, char* libname) {
+int lua_require(lua_State* L, const char* libname) {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, libname);
 	return lua_pcall(L, 1, 0, 0);
+}
+
+void require_or_die(lua_State* L, const char* name) {
+	int retval = lua_require(L, name);
+	if (retval != 0)
+		bailout(retval, lua_tolstring(L, -1, 0));
 }
 
 int main(int argc, char *argv[]) {
@@ -39,11 +45,7 @@ int main(int argc, char *argv[]) {
 	lua_setglobal(L, "arg");
 
 	// Since we explicitly need LuaJIT, we won't have to do much here.
-	int retval = lua_require(L, "ljwm.init");
-	if (retval != 0)
-		bailout(retval, lua_tolstring(L, -1, 0));
-	retval = lua_require(L, "ljwm.bootscript");
-	if (retval != 0)
-		bailout(retval, lua_tolstring(L, -1, 0));
+	require_or_die(L, "ljwm.init");
+	require_or_die(L, "ljwm.bootscript");
 	return 0;
 }

@@ -11,8 +11,11 @@ A C compiler, XCB, LuaJIT and some luck.
 
 # Credits
 Me, for doing many things.
-William Adams, for [LJIT2XCB](https://github.com/Wiladams/LJIT2XCB), from which I have stolen a lot of code for the xcb bindings.
+William Adams, for [LJIT2XCB](https://github.com/Wiladams/LJIT2XCB), from which I had stolen a lot of code for the xcb bindings, until I replaced most of it.
 The wrappers, however, are mine.
+`lua/StackTracePlus.lua` is [StackTracePlus](https://github.com/ignacio/StackTracePlus), made by ignacio on github.
+
+The contributions from other people are listed in the git repo, easily viewable on github.
 
 # License
 MIT
