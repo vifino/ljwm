@@ -11,4 +11,4 @@ local gwa_mt = {
 	end
 }
 
-ffi.metatype("xcb_get_window_attributes_cookie_t", {__index=gifc_mt})
+ffi.metatype("xcb_get_window_attributes_cookie_t", {__index=gwa_mt})

@@ -5,6 +5,7 @@ local xcbr = require("xcb.raw")
 
 -- Helpers
 local function fmtwid(wid)
+	if type(wid) == "cdata" then wid = tonumber(wid) end
 	return string.format("0x%08x", wid)
 end
 
@@ -113,6 +114,9 @@ local mt = {
 
 --- Constructor for a window object given a WID.
 c_window = function(conn, wid)
+	if type(wid) ~= "cdata" then
+		wid = ffi.cast(xcb_window_t, tonumber(wid))
+	end
 	local window = {
 		["wid"] = wid,
 		["conn"] = conn,

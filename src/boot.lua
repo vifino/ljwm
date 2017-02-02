@@ -10,4 +10,12 @@ table.remove(arg, 1)
 
 ljwm = require("ljwm")
 
-dofile(fname)
+local f, err = loadfile(fname)
+if err then
+	print("Compilation error: "..err)
+end
+
+local success, err = xpcall(f, debug.traceback)
+if not success then
+	print(err)
+end
