@@ -74,7 +74,7 @@ local state_machine = {
 		[0] = {"read_enum_constant_comma", function (tkn)
 			local n = tonumber(tkn)
 			if not n then error("Value not number: " .. tkn) end
-			state_targetenum[state_enumconstname] = state_enumindex
+			state_targetenum[state_enumconstname] = n
 			state_enumindex = n
 		end},
 	},
@@ -87,6 +87,7 @@ local state_machine = {
 		[";"] = {"waiting"},
 		[0] = {"wait_for_semicolon", function (tkn)
 			constants[tkn] = state_targetenum
+			state_enumindex = nil
 		end},
 	},
 }
