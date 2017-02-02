@@ -5,7 +5,8 @@ local xcbr = require("xcb.raw")
 return function(iter)
 	return function()
 		if iter.rem == 0 then return nil end
+		local screen = iter.data
 		xcbr.xcb_screen_next(iter)
-		return iter.data
+		return screen
 	end
 end
