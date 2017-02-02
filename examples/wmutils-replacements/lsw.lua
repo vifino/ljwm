@@ -1,6 +1,8 @@
+#!/usr/bin/env ljwm
+-- Small wmutils lsw clone written using ljwm
+
 local xcb = require("xcb.wrapper")
 local xcbr = require("xcb.raw")
-local conn = xcb.connect()
 
 local flags = {
 	all = false,
@@ -20,7 +22,6 @@ local wids = {}
 
 if argl == 0 then
 	flags.root = true
-	flags.all = true
 else
 	for i=1, #arg do
 		local elem = arg[i]
@@ -40,14 +41,13 @@ else
 	end
 end
 
+local conn = xcb.connect()
+
 local function get_root() -- sounds nasty.
 	local root_wid
-	print("uh oh, root wid")
 	for screen in conn:get_setup():setup_roots() do
-		print("l00p")
 		root_wid = screen.root
 	end
-	print("after loop, help?")
 	assert(root_wid, "failed to get root wid")
 	return root_wid
 end
@@ -57,12 +57,8 @@ if flags.only_root then
 	os.exit()
 end
 
-if flags.root then
+if flags.root or (#wids == 0) then
 	table.insert(wids, get_root())
-end
-
-if #wids == 0 then
-	usage()
 end
 
 local function should_list(window)
@@ -73,11 +69,11 @@ local function should_list(window)
 	end
 
 	local check_hidden = true
-	local check_ignored = true 
+	local check_ignored = true
 	if attrs.map_state ~= xcbr.XCB_MAP_STATE_VIEWABLE then -- hidden
 		check_hidden = flags.show_hidden
 	end
-	if attrs.override_redirect ~= 0 then -- ignored
+	if attrs.override_redirect == 0 then -- ignored
 		check_ignored = flags.show_hidden
 	end
 
@@ -85,17 +81,14 @@ local function should_list(window)
 end
 
 for i=1, #wids do
-	print("ok, wid no. "..tostring(i))
 	local window = conn:window(wids[i])
-	print("got window. getting children")
 	local children = window:children()
-	
-	print("looping over children")
+
 	for ci=1, #children do
 		local child = children[ci]
 
 		if should_list(child) then
 			print(child:fmt())
-		end		
-	end 
+		end
+	end
 end
