@@ -24,7 +24,7 @@ local c_window
 local index = {
 	--- Get WID in string format.
 	fmt = function(self)
-		return fmtwid(self.wid)
+		return fmtwid(self.id)
 	end,
 	--- Destroy the window.
 	destroy = function(self)
