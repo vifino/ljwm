@@ -40,10 +40,10 @@ local index = {
 
 	--- Reparrent the window
 	reparent = function(self, parent, x, y)
-		return xcbr.xcb_reparent_window(self.conn, self.id, parent, x, y)
+		return xcbr.xcb_reparent_window(self.conn, self.id, c_window(self.conn, parent).id, x, y)
 	end,
 	reparent_checked = function(self, parent, x, y)
-		return xcbr.xcb_reparent_window_checked(self.conn, self.id, parent, x, y)
+		return xcbr.xcb_reparent_window_checked(self.conn, self.id, c_window(self.conn, parent).id, x, y)
 	end,
 
 	--- Show the window.
