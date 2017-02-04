@@ -65,10 +65,10 @@ end
 
 local workspace = {
 	create_window_values = function (values) return handle_values(enums.xcb_cw_t, "XCB_CW_", window_cw, values) end,
-	create_gc_values = function (values) return handle_values(enums.xcb_gc_t, "XCB_GC_", gc_cw, values) end
+	gc_values = function (values) return handle_values(enums.xcb_gc_t, "XCB_GC_", gc_cw, values) end
 }
 
 STP.add_known_function(workspace.create_window_values, "create_values.create_window_values")
-STP.add_known_function(workspace.create_gc_values, "create_values.create_gc_values")
+STP.add_known_function(workspace.gc_values, "create_values.gc_values")
 
 return workspace
