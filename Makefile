@@ -52,4 +52,10 @@ clean:
 	rm -f $(OUTFILE) src/boot.o
 	rm -f lua/xcb/ffi_cdefs.lua
 
-# .PHONY: src/boot.lua.o
+# Testing
+test: ljwm
+	@echo "Note: These tests require an X server with at least one window."
+	@echo "      busted also sometimes fails to report success."
+	busted --lua=./ljwm --no-auto-insulate tests || true
+
+.PHONY: tests
