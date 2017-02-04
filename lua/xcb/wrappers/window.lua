@@ -25,71 +25,71 @@ local index = {
 	end,
 	--- Destroy the window.
 	destroy = function(self)
-		return xcbr.xcb_destroy_window(self.conn, self.wid)
+		return xcbr.xcb_destroy_window(self.conn, self.id)
 	end,
 	destroy_checked = function(self)
-		return xcbr.xcb_destroy_window_checked(self.conn, self.wid)
+		return xcbr.xcb_destroy_window_checked(self.conn, self.id)
 	end,
 	--- Destroy the subwindows.
 	destroy_subwindows = function(self)
-		return xcbr.xcb_destroy_subwindows(self.conn, self.wid)
+		return xcbr.xcb_destroy_subwindows(self.conn, self.id)
 	end,
 	destroy_subwindows_checked = function(self)
-		return xcbr.xcb_destroy_subwindows_checked(self.conn, self.wid)
+		return xcbr.xcb_destroy_subwindows_checked(self.conn, self.id)
 	end,
 
 	--- Reparrent the window
 	reparent = function(self, parent, x, y)
-		return xcbr.xcb_reparent_window(self.conn, self.wid, parent, x, y)
+		return xcbr.xcb_reparent_window(self.conn, self.id, parent, x, y)
 	end,
 	reparent_checked = function(self, parent, x, y)
-		return xcbr.xcb_reparent_window_checked(self.conn, self.wid, parent, x, y)
+		return xcbr.xcb_reparent_window_checked(self.conn, self.id, parent, x, y)
 	end,
 
 	--- Show the window.
 	map = function(self)
-		return xcbr.xcb_map_window(self.conn, self.wid)
+		return xcbr.xcb_map_window(self.conn, self.id)
 	end,
 	map_checked = function(self)
-		return xcbr.xcb_map_window_checked(self.conn, self.wid)
+		return xcbr.xcb_map_window_checked(self.conn, self.id)
 	end,
 	--- Show the subwindows.
 	map_subwindows = function(self)
-		return xcbr.xcb_map_subwindows(self.conn, self.wid)
+		return xcbr.xcb_map_subwindows(self.conn, self.id)
 	end,
 	map_subwindows_checked = function(self)
-		return xcbr.xcb_map_subwindows_checked(self.conn, self.wid)
+		return xcbr.xcb_map_subwindows_checked(self.conn, self.id)
 	end,
 
 	--- Hide the window.
 	unmap = function(self)
-		return xcbr.xcb_unmap_window(self.conn, self.wid)
+		return xcbr.xcb_unmap_window(self.conn, self.id)
 	end,
 	unmap_checked = function(self)
-		return xcbr.xcb_unmap_window_checked(self.conn, self.wid)
+		return xcbr.xcb_unmap_window_checked(self.conn, self.id)
 	end,
 	--- Hide the subwindows.
 	unmap_subwindows = function(self)
-		return xcbr.xcb_unmap_subwindows(self.conn, self.wid)
+		return xcbr.xcb_unmap_subwindows(self.conn, self.id)
 	end,
 	unmap_subwindows_checked = function(self)
-		return xcbr.xcb_unmap_subwindows_checked(self.conn, self.wid)
+		return xcbr.xcb_unmap_subwindows_checked(self.conn, self.id)
 	end,
 
 	--- Get window attributes.
 	get_attributes = function(self)
-		return xcbr.xcb_get_window_attributes(self.conn, self.wid)
+		return xcbr.xcb_get_window_attributes(self.conn, self.id)
 	end,
 	get_attributes_unchecked = function(self)
-		return xcbr.xcb_get_window_attributes_unchecked(self.conn, self.wid)
+		return xcbr.xcb_get_window_attributes_unchecked(self.conn, self.id)
 	end,
 
 	--- Get Children of a window.
 	-- This method is sadly complicated.
 	children = function(self)
-		local reply = xcbr.xcb_query_tree(self.conn, self.wid):reply(self.conn)
+		local reply = xcbr.xcb_query_tree(self.conn, self.id):reply(self.conn)
 		if reply == nil then
-			error("window: no such window "..fmtwid(self.wid))
+			error("window: no such window "..fmtwid(self.id))
 		end
 		local num_childs = reply.children_len
 		local list = ffi.C.malloc(t_wid_size * num_childs)
@@ -104,24 +104,25 @@ local index = {
 		return res
 	end,
 	create_gc = function(self, cid, values)
-		self.conn:create_gc(cid, self.wid, values)
+		self.conn:create_gc(cid, self.id, values)
 	end,
 }
 
 local mt = {
 	__index = index,
 	__tostring = function(self)
-		return "<window "..fmtwid(self.wid)..">"
+		return "<window "..fmtwid(self.id)..">"
 	end,
 }
 
 --- Constructor for a window object given a WID.
 c_window = function(conn, wid)
 	if type(wid) ~= "cdata" then
+		if getmetatable(wid) == mt then return wid end
 		wid = ffi.cast(xcb_window_t, tonumber(wid))
 	end
 	local window = {
-		["wid"] = wid,
+		["id"] = wid,
 		["conn"] = conn,
 	}
 	setmetatable(window, mt)

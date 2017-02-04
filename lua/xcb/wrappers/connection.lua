@@ -91,7 +91,7 @@ local fns_conn = {
 		if #vals > 0 then
 			vals_core = ffi.new("uint32_t[?]", #vals, vals)
 		end
-		xcbr.xcb_create_window(self, depth, wind, parent, x, y, width, height, border, class, visual, mask, vals_core)
+		xcbr.xcb_create_window(self, depth, c_window(self, wind).id, c_window(self, parent).id, x, y, width, height, border, class, visual, mask, vals_core)
 	end,
 	create_gc = function(self, cid, drawable, values)
 		local vals = {}
@@ -101,7 +101,11 @@ local fns_conn = {
 		if #vals > 0 then
 			vals_core = ffi.new("uint32_t[?]", #vals, vals)
 		end
-		xcbr.xcb_create_gc(self, cid, drawable, mask, vals_core)
+		-- This one can't be dealt with by direct casting
+		if type(drawable) == "table" then
+			drawable = drawable.id
+		end
+		xcbr.xcb_create_gc(self, c_gc(self, cid).id, drawable, mask, vals_core)
 	end,
 }
 ffi.metatype("xcb_connection_t", {__index=fns_conn})
