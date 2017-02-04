@@ -12,7 +12,21 @@ local index = {
 	poly_rectangle = function(self, window, rects)
 		local rects_raw = ffi.new("xcb_rectangle_t[?]", #rects, rects)
 		xcbr.xcb_poly_rectangle(self.conn, c_window(self.conn, window).id, self.id, #rects, rects_raw)
-	end
+	end,
+	create = function(self, drawable, values)
+		local vals = {}
+		local mask = 0
+		-- TODO: value insertion
+		local vals_core = nil
+		if #vals > 0 then
+			vals_core = ffi.new("uint32_t[?]", #vals, vals)
+		end
+		-- This one can't be dealt with by direct casting
+		if type(drawable) == "table" then
+			drawable = drawable.id
+		end
+		xcbr.xcb_create_gc(self.conn, self.id, drawable, mask, vals_core)
+	end,
 }
 
 local mt = {

@@ -9,8 +9,6 @@ local c_window = require("xcb.wrappers.window")
 local c_event = require("xcb.wrappers.event")
 local c_gc = require("xcb.wrappers.gc")
 
-local window_cw = require("xcb.wrappers.window_cw")
-
 local fns_conn = {
 	--- Disconnects the XCB connection.
 	disconnect = function(self)
@@ -76,36 +74,6 @@ local fns_conn = {
 	end,
 	gc = function(self, gid)
 		return c_gc(self, gid)
-	end,
-	create_window = function(self, depth, wind, parent, x, y, width, height, border, class, visual, values)
-		-- making this work correctly is done behind the scenes, i.e. here
-		local vals = {}
-		local mask = 0
-		for _, v in ipairs(window_cw) do
-			if values[v] then
-				mask = mask + enums.xcb_cw_t["XCB_CW_".. v:upper()]
-				table.insert(vals, values[v])
-			end
-		end
-		local vals_core = nil
-		if #vals > 0 then
-			vals_core = ffi.new("uint32_t[?]", #vals, vals)
-		end
-		xcbr.xcb_create_window(self, depth, c_window(self, wind).id, c_window(self, parent).id, x, y, width, height, border, class, visual, mask, vals_core)
-	end,
-	create_gc = function(self, cid, drawable, values)
-		local vals = {}
-		local mask = 0
-		-- TODO: value insertion
-		local vals_core = nil
-		if #vals > 0 then
-			vals_core = ffi.new("uint32_t[?]", #vals, vals)
-		end
-		-- This one can't be dealt with by direct casting
-		if type(drawable) == "table" then
-			drawable = drawable.id
-		end
-		xcbr.xcb_create_gc(self, c_gc(self, cid).id, drawable, mask, vals_core)
 	end,
 }
 ffi.metatype("xcb_connection_t", {__index=fns_conn})

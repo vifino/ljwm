@@ -3,6 +3,9 @@
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 
+local enums = require("xcb.enums")
+local window_cw = require("xcb.wrappers.window_cw")
+
 -- Helpers
 local function fmtwid(wid)
 	if type(wid) == "cdata" then wid = tonumber(wid) end
@@ -103,8 +106,21 @@ local index = {
 		end
 		return res
 	end,
-	create_gc = function(self, cid, values)
-		self.conn:create_gc(cid, self.id, values)
+	create = function(self, depth, parent, x, y, width, height, border, class, visual, values)
+		-- making this work correctly is done behind the scenes, i.e. here
+		local vals = {}
+		local mask = 0
+		for _, v in ipairs(window_cw) do
+			if values[v] then
+				mask = mask + enums.xcb_cw_t["XCB_CW_".. v:upper()]
+				table.insert(vals, values[v])
+			end
+		end
+		local vals_core = nil
+		if #vals > 0 then
+			vals_core = ffi.new("uint32_t[?]", #vals, vals)
+		end
+		xcbr.xcb_create_window(self.conn, depth, self.id, c_window(self.conn, parent).id, x, y, width, height, border, class, visual, mask, vals_core)
 	end,
 }
 

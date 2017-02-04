@@ -13,11 +13,11 @@ local values = {
 	back_pixel = screen.white_pixel,
 	event_mask = xcbe.xcb_event_mask_t.XCB_EVENT_MASK_EXPOSURE
 }
-conn:create_window(0, wind, screen.root, 0, 0, 256, 256, 1, xcbe.xcb_window_class_t.XCB_WINDOW_CLASS_INPUT_OUTPUT, screen.root_visual, values)
+wind:create(0, screen.root, 0, 0, 256, 256, 1, xcbe.xcb_window_class_t.XCB_WINDOW_CLASS_INPUT_OUTPUT, screen.root_visual, values)
 wind:map()
 
 local gc = conn:gc(conn:generate_id())
-wind:create_gc(gc, {})
+gc:create(wind, {})
 
 conn:flush()
 
