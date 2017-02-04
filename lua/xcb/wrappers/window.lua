@@ -103,10 +103,13 @@ local index = {
 		end
 		return res
 	end,
+	create_gc = function(self, cid, values)
+		self.conn:create_gc(cid, self.wid, values)
+	end,
 }
 
 local mt = {
-	__index=index,
+	__index = index,
 	__tostring = function(self)
 		return "<window "..fmtwid(self.wid)..">"
 	end,

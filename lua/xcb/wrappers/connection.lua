@@ -7,6 +7,7 @@ local enums = require("xcb.enums")
 
 local c_window = require("xcb.wrappers.window")
 local c_event = require("xcb.wrappers.event")
+local c_gc = require("xcb.wrappers.gc")
 
 local window_cw = require("xcb.wrappers.window_cw")
 
@@ -73,6 +74,9 @@ local fns_conn = {
 	window = function(self, wid)
 		return c_window(self, wid)
 	end,
+	gc = function(self, gid)
+		return c_gc(self, gid)
+	end,
 	create_window = function(self, depth, wind, parent, x, y, width, height, border, class, visual, values)
 		-- making this work correctly is done behind the scenes, i.e. here
 		local vals = {}
@@ -88,6 +92,16 @@ local fns_conn = {
 			vals_core = ffi.new("uint32_t[?]", #vals, vals)
 		end
 		xcbr.xcb_create_window(self, depth, wind, parent, x, y, width, height, border, class, visual, mask, vals_core)
+	end,
+	create_gc = function(self, cid, drawable, values)
+		local vals = {}
+		local mask = 0
+		-- TODO: value insertion
+		local vals_core = nil
+		if #vals > 0 then
+			vals_core = ffi.new("uint32_t[?]", #vals, vals)
+		end
+		xcbr.xcb_create_gc(self, cid, drawable, mask, vals_core)
 	end,
 }
 ffi.metatype("xcb_connection_t", {__index=fns_conn})
