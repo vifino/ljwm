@@ -27,11 +27,14 @@ while true do
 	local ev = conn:wait_for_event()
 	if ev then
 		if ev.type == "expose" then
-			print("Exposed.")
-			gc:poly_arc(wind, {
-				{8, 8, 240, 240, 0, 360 * 64}
-			})
-			conn:flush()
+			local expose = ev.expose
+			if expose.window == wind.id then
+				print("Exposed, " .. expose.x .. " " .. expose.y .. " / " .. expose.width .. "x" .. expose.height)
+				gc:poly_arc(wind, {
+					{8, 8, 240, 240, 0, 360 * 64}
+				})
+				conn:flush()
+			end
 		end
 	else
 		print("Error.")

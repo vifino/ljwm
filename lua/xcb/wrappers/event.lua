@@ -42,11 +42,11 @@ local convert_otypname = {
 }
 local convert_nametype = {}
 for _, v in pairs(convert_otypname) do
-	convert_nametype[v] = "xcb_" .. v .. "_event_t"
+	convert_nametype[v] = ffi.typeof("xcb_" .. v .. "_event_t *")
 end
 local function index(self, k)
-	if conversions[k] then
-		return ffi.cast(convert_nametype[k], self.raw[0])
+	if convert_nametype[k] then
+		return ffi.cast(convert_nametype[k], self.raw[0])[0]
 	end
 	return nil
 end
