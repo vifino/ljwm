@@ -63,4 +63,7 @@ local function c_event(ev)
 	return event
 end
 
+
+STP.add_known_function(c_event, "xcb.wrappers.event constructor")
+
 return c_event

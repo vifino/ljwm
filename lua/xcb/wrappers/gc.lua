@@ -3,6 +3,7 @@
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 local c_window = require("xcb.wrappers.window")
+local cv = require("xcb.wrappers.create_values")
 
 local index = {
 	poly_arc = function(self, window, arcs)
@@ -14,13 +15,7 @@ local index = {
 		xcbr.xcb_poly_rectangle(self.conn, c_window(self.conn, window).id, self.id, #rects, rects_raw)
 	end,
 	create = function(self, drawable, values)
-		local vals = {}
-		local mask = 0
-		-- TODO: value insertion
-		local vals_core = nil
-		if #vals > 0 then
-			vals_core = ffi.new("uint32_t[?]", #vals, vals)
-		end
+		local mask, vals_core = cv.create_gc_values(values)
 		-- This one can't be dealt with by direct casting
 		if type(drawable) == "table" then
 			drawable = drawable.id
@@ -49,5 +44,7 @@ c_gc = function(conn, gcid)
 	setmetatable(gc, mt)
 	return gc
 end
+
+STP.add_known_function(c_gc, "xcb.wrappers.gc constructor")
 
 return c_gc
