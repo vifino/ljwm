@@ -10,8 +10,11 @@ local xcbr = require("xcb.raw")
 local wrappers = {
 	"connection",
 	"setup",
+	"create_values",
 	"window",
 	"window_attributes",
+	"gc",
+	"event",
 	"get_input_focus",
 	"query_tree",
 	"iterator",

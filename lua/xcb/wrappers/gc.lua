@@ -7,10 +7,12 @@ local cv = require("xcb.wrappers.create_values")
 
 local index = {
 	poly_arc = function(self, window, arcs)
+		if arcs[0] then error("Can't have a zero index in the arcs array.") end
 		local arcs_raw = ffi.new("xcb_arc_t[?]", #arcs, arcs)
 		xcbr.xcb_poly_arc(self.conn, c_window(self.conn, window).id, self.id, #arcs, arcs_raw)
 	end,
 	poly_rectangle = function(self, window, rects)
+		if rects[0] then error("Can't have a zero index in the rects array.") end
 		local rects_raw = ffi.new("xcb_rectangle_t[?]", #rects, rects)
 		xcbr.xcb_poly_rectangle(self.conn, c_window(self.conn, window).id, self.id, #rects, rects_raw)
 	end,
