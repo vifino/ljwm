@@ -1,6 +1,6 @@
 #!/bin/sh
 # It's assumed you're running this from the ljwm clone root directory.
-Xephyr :82 &
+Xephyr :82 -screen 800x600 &
 sleep 1
 DISPLAY=:82
 xterm &
