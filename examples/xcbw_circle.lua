@@ -11,9 +11,9 @@ print("Creating window & GC")
 local wind = conn:window(conn:generate_id())
 local values = {
 	back_pixel = screen.white_pixel,
-	event_mask = xcbe.xcb_event_mask_t.XCB_EVENT_MASK_EXPOSURE
+	event_mask = xcbe.event_mask.EXPOSURE
 }
-wind:create(0, screen.root, 0, 0, 256, 256, 1, xcbe.xcb_window_class_t.XCB_WINDOW_CLASS_INPUT_OUTPUT, screen.root_visual, values)
+wind:create(0, screen.root, 0, 0, 256, 256, 1, xcbe.window_class.INPUT_OUTPUT, screen.root_visual, values)
 wind:map()
 
 local gc = conn:gc(conn:generate_id())

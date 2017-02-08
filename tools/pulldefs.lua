@@ -143,13 +143,29 @@ local function tokenize_line(line)
 	submit_token(line:sub(token_start), false)
 end
 
+-- Type name replacements.
+local constant_name_replacements = {
+	ATOM_ENUM = "ATOM",
+	PIXMAP_ENUM = "PIXMAP",
+}
+local function constant_name_fixup_key(typename)
+	return typename:gsub("^xcb_", ""):gsub("_t$", "")
+end
+
+local function constant_name_fixup_value(ENUM_NAME, value)
+	local prefix = constant_name_replacements[ENUM_NAME] or ENUM_NAME
+	return value:gsub("^XCB_"..prefix.."_", "")
+end
+
 local function end_file()
 	print("]]")
 	print("return {")
 	for k, v in pairs(constants) do
-		print("\t[\"" .. k .. "\"] = {")
+		local enum_name = constant_name_fixup_key(k)
+		local ENUM_NAME = enum_name:upper()
+		print("\t[\"" .. enum_name .. "\"] = {")
 	    for k, v in pairs(v) do
-			print("\t\t[\"" .. k .. "\"] = " .. v .. ",")
+			print("\t\t[\"" .. constant_name_fixup_value(ENUM_NAME, k) .. "\"] = " .. v .. ",")
 		end
 		print("\t},")
 	end

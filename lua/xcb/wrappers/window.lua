@@ -3,7 +3,6 @@
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 
-local enums = require("xcb.enums")
 local cv = require("xcb.wrappers.create_values")
 
 -- Helpers

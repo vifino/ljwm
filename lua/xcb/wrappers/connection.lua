@@ -3,7 +3,6 @@
 
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
-local enums = require("xcb.enums")
 
 local c_window = require("xcb.wrappers.window")
 local c_event = require("xcb.wrappers.event")

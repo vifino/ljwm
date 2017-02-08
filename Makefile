@@ -10,6 +10,7 @@ OUTFILE ?= ljwm
 BOOTSCRIPT ?= src/boot.lua
 
 CFLAGS ?= -O2
+STRIP ?= strip
 
 LIBS ?= -lm -ldl $(shell pkg-config --libs xcb xcb-util)
 
@@ -26,8 +27,15 @@ XCBINCLUDE = $(shell pkg-config --variable=includedir xcb)/xcb/
 # Targets
 ##
 
-# ffi_cdefs has to be generated first so that things don't break
-all: lua/xcb/ffi_cdefs.lua $(OUTFILE)
+# Release/Debug configuration s.
+
+debug: LJDUMPFLAGS+= -g
+debug: lua/xcb/ffi_cdefs.lua $(OUTFILE)
+
+release: lua/xcb/ffi_cdefs.lua $(OUTFILE)
+	$(STRIP) --strip-all $(OUTFILE)
+
+all: debug
 
 # Generate CDefs
 lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h tools/pulldefs.lua
@@ -36,11 +44,11 @@ lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h tools/pulldefs.l
 # Compile Lua scripts to objects
 %.o: %.lua
 	@echo LJDUMP	$(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g'):	$< -\> $@
-	@$(LJBIN) -b -g -n $(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g') $< $@
+	@$(LJBIN) -b $(LJDUMPFLAGS) -n $(shell echo $< | sed -e 's/^lua\///' -e 's/\.lua//' -e 's/\//./g') $< $@
 
 src/boot.o: $(BOOTSCRIPT)
 	@echo LJDUMP	ljwm.bootscript:	$(BOOTSCRIPT) -\> src/boot.o
-	@$(LJBIN) -b -g -n ljwm.bootscript ${BOOTSCRIPT} src/boot.o
+	@$(LJBIN) -b ${LJDUMPFLAGS} -n ljwm.bootscript ${BOOTSCRIPT} src/boot.o
 
 # Main bin, Bootscript and shtuff.
 $(OUTFILE): src/main.c src/boot.o lua/xcb/ffi_cdefs.o $(LUAOBJECTS)

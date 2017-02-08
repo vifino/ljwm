@@ -56,12 +56,12 @@ local configure_cw = {
 local ffi = require("ffi")
 local enums = require("xcb.enums")
 
-local function handle_values(enumset, prefix, cw, values)
+local function handle_values(enumset, cw, values)
 	local vals = {}
 	local mask = 0
 	for _, v in ipairs(cw) do
 		if values[v] then
-			mask = mask + enumset[prefix .. v:upper()]
+			mask = mask + enumset[v:upper()]
 			table.insert(vals, values[v])
 		end
 	end
@@ -73,9 +73,9 @@ local function handle_values(enumset, prefix, cw, values)
 end
 
 local workspace = {
-	window_values = function (values) return handle_values(enums.xcb_cw_t, "XCB_CW_", window_cw, values) end,
-	gc_values = function (values) return handle_values(enums.xcb_gc_t, "XCB_GC_", gc_cw, values) end,
-	config_values = function (values) return handle_values(enums.xcb_config_window_t, "XCB_CONFIG_WINDOW_", configure_cw, values) end
+	window_values = function (values) return handle_values(enums.cw, window_cw, values) end,
+	gc_values = function (values) return handle_values(enums.gc, gc_cw, values) end,
+	config_values = function (values) return handle_values(enums.config_window, configure_cw, values) end
 }
 
 STP.add_known_function(workspace.window_values, "create_values.window_values")

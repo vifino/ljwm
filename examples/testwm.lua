@@ -13,9 +13,9 @@ local root = conn:window(screen.root)
 
 root:change({
 	event_mask = 
-	xcbe.xcb_event_mask_t.XCB_EVENT_MASK_STRUCTURE_NOTIFY +
-	xcbe.xcb_event_mask_t.XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY +
-	xcbe.xcb_event_mask_t.XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT
+	xcbe.event_mask.STRUCTURE_NOTIFY +
+	xcbe.event_mask.SUBSTRUCTURE_NOTIFY +
+	xcbe.event_mask.SUBSTRUCTURE_REDIRECT
 })
 conn:flush()
 
@@ -34,13 +34,13 @@ while true do
 			--  let's make that happen!
 			local vl = {}
 			local vm = ev.configure_request.value_mask
-			vl.x = configure_request_svh(ev.configure_request.x, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_X)
-			vl.y = configure_request_svh(ev.configure_request.y, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_Y)
-			vl.width = configure_request_svh(ev.configure_request.width, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_WIDTH)
-			vl.height = configure_request_svh(ev.configure_request.height, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_HEIGHT)
-			vl.border_width = configure_request_svh(ev.configure_request.border_width, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_BORDER_WIDTH)
-			vl.sibling = configure_request_svh(ev.configure_request.sibling, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_SIBLING)
-			vl.stack_mode = configure_request_svh(ev.configure_request.stack_mode, vm, xcbe.xcb_config_window_t.XCB_CONFIG_WINDOW_STACK_MODE)
+			vl.x = configure_request_svh(ev.configure_request.x, vm, xcbe.config_window.X)
+			vl.y = configure_request_svh(ev.configure_request.y, vm, xcbe.config_window.Y)
+			vl.width = configure_request_svh(ev.configure_request.width, vm, xcbe.config_window.WIDTH)
+			vl.height = configure_request_svh(ev.configure_request.height, vm, xcbe.config_window.HEIGHT)
+			vl.border_width = configure_request_svh(ev.configure_request.border_width, vm, xcbe.config_window.BORDER_WIDTH)
+			vl.sibling = configure_request_svh(ev.configure_request.sibling, vm, xcbe.config_window.SIBLING)
+			vl.stack_mode = configure_request_svh(ev.configure_request.stack_mode, vm, xcbe.config_window.STACK_MODE)
 			conn:window(ev.configure_request.window):configure(vl)
 			conn:flush()
 		end
