@@ -63,7 +63,6 @@ clean:
 # Testing
 test: ljwm
 	@echo "Note: These tests require an X server with at least one window."
-	@echo "      busted also sometimes fails to report success."
-	busted --lua=./ljwm --no-auto-insulate tests || true
+	busted --lua=./ljwm --no-auto-insulate --defer-print tests || true
 
 .PHONY: tests

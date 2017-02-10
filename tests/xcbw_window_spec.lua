@@ -6,7 +6,7 @@ describe("xcb.wrappers can connect,", function()
 		local wid = conn:get_input_focus():reply(conn).focus
 		assert.is_truthy(wid)
 
-		describe("and list the children", function()
+		it("and list the children", function()
 			local wind = conn:window(wid)
 			assert.is_truthy(wind)
 			print("Window:", wind)
