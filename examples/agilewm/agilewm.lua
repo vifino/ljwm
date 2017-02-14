@@ -119,7 +119,8 @@ for screen in conn:get_setup():setup_roots() do
 	end
 	screens[screen.root] = env
 	for k, v in ipairs(args) do
-		local f = loadfile(v)
+		local f, err = loadfile(v)
+		if not f then error(err) end
 		setfenv(f, env)
 		mdt[k] = f()
 	end
@@ -139,10 +140,18 @@ conn:flush()
 -- Get ready to distribute "init"...
 
 -- Unsure how this should be written or if it should be moved into LJWM itself
+local function try_get_field(struct, field)
+	local s, r = pcall(function () return struct[field] end)
+	if not s then return nil end
+	return r
+end
 local function determine_window_root(evtype, evdata, evsent)
 	-- Will either always return nil or always return something for
 	--  a given event type, I think?
-	local w = evdata["window"]
+	local w = try_get_field(evdata, "window")
+	if not w then
+		return try_get_field(evdata, "root")
+	end
 	if w then
 		local ok, res = pcall(function ()
 			local c, p, r = conn:window(w):tree()
