@@ -113,21 +113,21 @@ local index = {
 	create = function(self, depth, parent, x, y, width, height, border, class, visual, values)
 		-- making this work correctly is done behind the scenes, i.e. here
 		local mask, vals_core = cv.window_values(values)
-		xcbr.xcb_create_window(self.conn, depth, self.id, c_window(self.conn, parent).id, x, y, width, height, border, class, visual, mask, vals_core)
+		return xcbr.xcb_create_window(self.conn, depth, self.id, c_window(self.conn, parent).id, x, y, width, height, border, class, visual, mask, vals_core)
 	end,
 	change = function(self, values)
 		local mask, vals_core = cv.window_values(values)
-		xcbr.xcb_change_window_attributes(self.conn, self.id, mask, vals_core)
+		return xcbr.xcb_change_window_attributes(self.conn, self.id, mask, vals_core)
 	end,
 	configure = function(self, values)
 		local mask, vals_core = cv.config_values(values)
-		xcbr.xcb_configure_window(self.conn, self.id, mask, vals_core)
+		return xcbr.xcb_configure_window(self.conn, self.id, mask, vals_core)
 	end,
 	-- Unsure what difference there is between this and configure.
 	-- c. all the missing _checked functions
 	configure_aux = function(self, values)
 		local mask, vals_core = cv.config_values(values)
-		xcbr.xcb_configure_window(self.conn, self.id, mask, vals_core)
+		return xcbr.xcb_configure_window(self.conn, self.id, mask, vals_core)
 	end,
 }
 

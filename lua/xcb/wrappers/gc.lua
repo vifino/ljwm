@@ -48,11 +48,11 @@ local index = {
 
 	create = function(self, window, values)
 		local mask, vals_core = cv.gc_values(values)
-		xcbr.xcb_create_gc(self.conn, self.id, drawable(window), mask, vals_core)
+		return xcbr.xcb_create_gc(self.conn, self.id, drawable(window), mask, vals_core)
 	end,
 	change = function(self, values)
 		local mask, vals_core = cv.gc_values(values)
-		xcbr.xcb_change_gc(self.conn, self.id, mask, vals_core)
+		return xcbr.xcb_change_gc(self.conn, self.id, mask, vals_core)
 	end,
 }
 
