@@ -1,6 +1,8 @@
 #!/usr/bin/env ljwm
 -- Small wmutils lsw clone written using ljwm
 
+local arg = {...}
+
 local xcb = require("xcb.wrapper")
 local xcbr = require("xcb.raw")
 
