@@ -13,6 +13,7 @@ local wrappers = {
 	"create_values",
 	"window",
 	"window_attributes",
+	"geometry",
 	"gc",
 	"event",
 	"get_input_focus",
