@@ -1,10 +1,7 @@
 -- LJWM default bootscript
 -- Loads files and what not.
 
-local args = arg
-arg = nil
-
-local fname = table.remove(args, 1)
+local fname = table.remove(arg, 1)
 if not fname then
 	print("Usage: ljwm file.lua [args..]")
 	os.exit(1)
@@ -17,7 +14,7 @@ if err then
 	print("Compilation error: "..err)
 end
 
-local success, err = xpcall(f, STP.stacktrace, unpack(args))
+local success, err = xpcall(f, STP.stacktrace, unpack(arg))
 if not success then
 	io.write(err)
 end
