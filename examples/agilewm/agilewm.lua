@@ -4,8 +4,8 @@
 --  not bothering to do anything and passing through requests as given.
 
 local args = {...}
-for v in ipairs(args) do
-	print("Module: " .. v)
+for k, v in ipairs(args) do
+	print("Module " .. k .. ":" .. v)
 end
 
 -- First things first, do the initial connection,
@@ -200,6 +200,7 @@ while true do
 		if not ev.type then
 			print("Dx ", ev.raw.response_type)
 		else
+			print(ev.type)
 			distribute_event(pre_transform_event(ev))
 		end
 	else

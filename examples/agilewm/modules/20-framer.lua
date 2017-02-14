@@ -28,6 +28,8 @@ local function reconfigure_frame(wrp, frame, evdata)
 	local posy = evdata.values.y or geom.y
 	evdata.values.x = margin.l
 	evdata.values.y = margin.u
+	-- This just causes issues.
+	evdata.values.border_width = 0
 	local w = evdata.values.width or (geom.width - (margin.l + margin.r))
 	local h = evdata.values.height or (geom.height - (margin.u + margin.d))
 	local rcfg = {x = posx,
@@ -83,6 +85,7 @@ local function precreate_frame(wid, consultant)
 	local wrp = connection:window(wid)
 	local frame = create_frame(wrp, redirection.margin, redirection.event_mask)
 	wrp:reparent(frame, redirection.margin.l, redirection.margin.u)
+	wrp:configure({border_width = 0})
 	wrp:map()
 	frames[wid] = frame
 	margins[frame.id] = redirection.margin
@@ -114,23 +117,30 @@ framer = {}
 framer.precreate_frame = precreate_frame
 framer.destroy_frame = destroy_frame
 
+local function map_request(w)
+	if aframe[w] then
+		-- Just in case.
+		return w
+	end
+	if frames[w] then
+		-- Ensure the window is mapped
+		connection:window(w):map()
+		-- and make the request to be to map the frame instead
+		return frames[w].id
+	end
+	local a, b = pcall(function()
+		local c, p, r = connection:window(w):tree()
+		return (p == r) and (r == screen.root)
+	end)
+	if a and b then
+		return (precreate_frame(w) or w)
+	end
+	return w
+end
+
 return function (evtype, evdata, evsent)
 	if evtype == "map_request" then
-		if frames[evdata.window] then
-			-- Ensure the window is mapped
-			connection:window(evdata.window):map()
-			-- and make the request to be to map the frame instead
-			evdata.window = frames[evdata.window].id
-			return false
-		end
-		local a, b = pcall(function()
-			local c, p, r = connection:window(evdata.window):tree()
-			return (p == r) and (r == screen.root)
-		end)
-		if not a then return false end
-		if b then
-			evdata.window = precreate_frame(evdata.window)
-		end
+		evdata.window = map_request(evdata.window)
 		return false
 	end
 	if evtype == "configure_request" then
@@ -142,6 +152,8 @@ return function (evtype, evdata, evsent)
 		end
 		return false
 	end
+	-- This can be spuriously generated if a window was already mapped.
+	-- Keep that in mind.
 	if evtype == "unmap_notify" then
 		if frames[evdata.window] then
 			frames[evdata.window]:unmap()
