@@ -149,12 +149,15 @@ local mt = {
 
 --- Constructor for a window object given a WID.
 c_window = function(conn, wid)
-	if type(wid) ~= "cdata" then
-		if getmetatable(wid) == mt then return wid end
-		wid = ffi.cast(xcb_window_t, tonumber(wid))
+	if type(wid) == "table" then
+		if getmetatable(wid) == mt then
+			return wid
+		else
+			error("Incompatible wrapper passed to c_window.")
+		end
 	end
 	local window = {
-		["id"] = wid,
+		["id"] = tonumber(wid),
 		["conn"] = conn,
 	}
 	setmetatable(window, mt)

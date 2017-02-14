@@ -78,9 +78,12 @@ local mt = {
 
 --- Constructor for a GC object given a GCID.
 c_gc = function(conn, gcid)
-	if type(gcid) ~= "cdata" then
-		if getmetatable(gcid) == mt then return gcid end
-		gcid = ffi.cast("xcb_gcontext_t", tonumber(gcid))
+	if type(gcid) == "table" then
+		if getmetatable(gcid) == mt then
+			return gcid
+		else
+			error("Incompatible wrapper passed to c_gc.")
+		end
 	end
 	local gc = {
 		["id"] = gcid,
