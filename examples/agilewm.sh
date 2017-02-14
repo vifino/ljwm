@@ -5,4 +5,4 @@ sleep 1
 DISPLAY=:82
 xterm &
 sleep 1
-./ljwm examples/testwm.lua
+./ljwm examples/agilewm.lua examples/agilewm-modules/*
