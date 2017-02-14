@@ -86,13 +86,14 @@ local index = {
 
 	--- Get Children of a window.
 	-- This method is sadly complicated.
-	children = function(self)
+	tree = function(self)
 		local reply = xcbr.xcb_query_tree(self.conn, self.id):reply(self.conn)
 		if reply == nil then
 			error("window: no such window "..fmtwid(self.id))
 		end
 		local num_childs = reply.children_len
 		local list = ffi.C.malloc(t_wid_size * num_childs)
+		if not list then error("window: failed to allocate memory for children list buffer") end
 		ffi.copy(list, xcbr.xcb_query_tree_children(reply), t_wid_size * num_childs)
 		list = ffi.cast(xcb_window_t_ptr, list)
 
@@ -101,7 +102,13 @@ local index = {
 			local child = list[i-1]
 			res[i] = c_window(self.conn, tonumber(child))
 		end
-		return res
+		ffi.C.free(list)
+		return res, reply.parent, reply.root
+	end,
+	-- semi-alias to tree now
+	children = function(self)
+		local c, p, r = self:tree()
+		return c
 	end,
 	create = function(self, depth, parent, x, y, width, height, border, class, visual, values)
 		-- making this work correctly is done behind the scenes, i.e. here

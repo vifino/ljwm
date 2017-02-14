@@ -5,6 +5,8 @@ local bit = require("bit")
 local xcbr = require("xcb.raw")
 
 local convert_otypname = {
+	-- [0] = "error", -- No structure for this???
+	-- what's 1?
 	[2] = "key_press",
 	[3] = "key_release",
 	[4] = "button_press",
@@ -54,7 +56,8 @@ end
 local function c_event(ev)
 	local event = {
 		["raw"] = ffi.gc(ev, ffi.C.free),
-		["type"] = convert_otypname[bit.band(0x7F, ev.response_type)]
+		["type"] = convert_otypname[bit.band(0x7F, ev.response_type)],
+		["sendevent"] = (bit.band(0x80, ev.response_type) ~= 0)
 	}
 	setmetatable(event, {
 		__index = index,
