@@ -108,6 +108,7 @@ for screen in conn:get_setup():setup_roots() do
 	env.xcb = xcb
 	env.xcbe = xcbe
 	env.connection = conn
+	env.screen = screen
 	local mdt = {}
 	env.submit_ev = function (evtype, evdata, evsent)
 		for _, v in ipairs(mdt) do
