@@ -165,7 +165,7 @@ local function constant_name_fixup_value(ENUM_NAME, value)
 end
 
 local function end_file()
-	cdefs:write("]]")
+	cdefs:write("]]\nreturn true")
 	enums:write("return {\n")
 	for k, v in pairs(constants) do
 		local enum_name = constant_name_fixup_key(k)

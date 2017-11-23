@@ -3,6 +3,7 @@
 
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
+local xcbe = require("xcb.enums")
 
 local c_window = require("xcb.wrappers.window")
 local c_event = require("xcb.wrappers.event")
@@ -12,6 +13,7 @@ local fns_conn = {
 	--- Disconnects the XCB connection.
 	disconnect = function(self)
 		if self then
+			self:flush(true)
 			xcbr.xcb_disconnect(ffi.gc(self, nil))
 		end
 	end,
@@ -19,7 +21,7 @@ local fns_conn = {
 	-- @param sync Forces syncronous flush instead of async one.
 	flush = function(self, sync)
 		if sync then
-			return xcb.xcb_aux_flush(self)
+			return xcbr.xcb_aux_sync(self)
 		end
 		return xcbr.xcb_flush(self)
 	end,
@@ -47,6 +49,12 @@ local fns_conn = {
 	end,
 	get_input_focus_unchecked = function(self)
 		return xcbr.xcb_get_input_focus_unchecked(self)
+	end,
+	--- Set input focus.
+	-- @param win The window to focus.
+	-- @param revert_to A xcb.enums.input_focus value.
+	set_input_focus = function(self, win, revert_to)
+		return xcbr.xcb_set_input_focus(self, revert_to or xcbe.input_focus.NONE, win.id, xcbe.time.CURRENT_TIME)
 	end,
 
 	--- Wait for an event.

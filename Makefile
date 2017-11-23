@@ -22,6 +22,7 @@ LUAFILES = $(shell find lua -type f -name '*.lua')
 LUAOBJECTS = $(LUAFILES:%.lua=%.o)
 
 XCBINCLUDE = $(shell pkg-config --variable=includedir xcb)/xcb/
+XCBHEADERS = $(XCBINCLUDE)xproto.h $(XCBINCLUDE)xcb_aux.h
 
 ##
 # Targets
@@ -38,7 +39,7 @@ all: debug
 
 # Generate CDefs
 lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h tools/pulldefs.lua
-	$(CC) -E $(XCBINCLUDE)xproto.h | $(LJBIN) tools/pulldefs.lua $(XCBINCLUDE) lua/xcb/ffi_cdefs.lua lua/xcb/enums.lua
+	$(CC) -E $(XCBHEADERS) | $(LJBIN) tools/pulldefs.lua $(XCBINCLUDE) lua/xcb/ffi_cdefs.lua lua/xcb/enums.lua
 
 # Compile Lua scripts to objects
 %.o: %.lua
