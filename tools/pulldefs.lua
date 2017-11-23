@@ -2,8 +2,15 @@
 
 local args = {...}
 
-print("local ffi = require(\"ffi\")")
-print("ffi.cdef [[")
+if not #args == 3 then
+	error("Usage: pulldefs.lua $(XCBINCLUDE) ffi_cdefs.lua enums.lua")
+end
+
+local cdefs = assert(io.open(args[2], "w"))
+local enums = assert(io.open(args[3], "w"))
+
+cdefs:write("local ffi = require(\"ffi\")\n")
+cdefs:write("ffi.cdef [[\n")
 
 local constants = {}
 
@@ -158,18 +165,18 @@ local function constant_name_fixup_value(ENUM_NAME, value)
 end
 
 local function end_file()
-	print("]]")
-	print("return {")
+	cdefs:write("]]")
+	enums:write("return {\n")
 	for k, v in pairs(constants) do
 		local enum_name = constant_name_fixup_key(k)
 		local ENUM_NAME = enum_name:upper()
-		print("\t[\"" .. enum_name .. "\"] = {")
-	    for k, v in pairs(v) do
-			print("\t\t[\"" .. constant_name_fixup_value(ENUM_NAME, k) .. "\"] = " .. v .. ",")
+		enums:write("\t[\"" .. enum_name .. "\"] = {\n")
+		for k, v in pairs(v) do
+			enums:write("\t\t[\"" .. constant_name_fixup_value(ENUM_NAME, k) .. "\"] = " .. v .. ",\n")
 		end
-		print("\t},")
+		enums:write("\t},\n")
 	end
-	print("}")
+	enums:write("}\n")
 	if state == "wait_for_semicolon" then
 		io.stderr:write("pulldefs.lua: Warning: stopped while waiting for a semicolon. Check state machine & tokenization logic.\n")
 	end
@@ -180,6 +187,8 @@ while true do
 	local l = io.read()
 	if not l then
 		end_file()
+		cdefs:close()
+		enums:close()
 		return
 	end
 	if l:sub(1, 1) == "#" then
@@ -193,7 +202,7 @@ while true do
 	else
 		if not l:find("^[ \t\r\n]*$") then
 			if allow then
-				print(l)
+				cdefs:write(l.."\n")
 				tokenize_line(l)
 			end
 		end

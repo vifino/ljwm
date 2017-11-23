@@ -27,8 +27,7 @@ XCBINCLUDE = $(shell pkg-config --variable=includedir xcb)/xcb/
 # Targets
 ##
 
-# Release/Debug configuration s.
-
+# Release/Debug configurations.
 debug: LJDUMPFLAGS+= -g
 debug: lua/xcb/ffi_cdefs.lua $(OUTFILE)
 
@@ -39,7 +38,7 @@ all: debug
 
 # Generate CDefs
 lua/xcb/ffi_cdefs.lua: $(XCBINCLUDE)xcb.h $(XCBINCLUDE)xproto.h tools/pulldefs.lua
-	$(CC) -E $(XCBINCLUDE)xproto.h | $(LJBIN) tools/pulldefs.lua $(XCBINCLUDE) > lua/xcb/ffi_cdefs.lua
+	$(CC) -E $(XCBINCLUDE)xproto.h | $(LJBIN) tools/pulldefs.lua $(XCBINCLUDE) lua/xcb/ffi_cdefs.lua lua/xcb/enums.lua
 
 # Compile Lua scripts to objects
 %.o: %.lua
