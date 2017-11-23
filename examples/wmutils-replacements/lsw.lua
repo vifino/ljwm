@@ -4,7 +4,7 @@
 local arg = {...}
 
 local xcb = require("xcb.wrapper")
-local xcbr = require("xcb.raw")
+local xcbe = require("xcb.enums")
 
 local flags = {
 	all = false,
@@ -72,7 +72,7 @@ local function should_list(window)
 
 	local check_hidden = true
 	local check_ignored = true
-	if attrs.map_state ~= xcbr.XCB_MAP_STATE_VIEWABLE then -- hidden
+	if attrs.map_state ~= xcbe.map_state.VIEWABLE then -- hidden
 		check_hidden = flags.show_hidden
 	end
 	if attrs.override_redirect == 0 then -- ignored
