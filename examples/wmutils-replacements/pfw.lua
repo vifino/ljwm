@@ -1,5 +1,5 @@
 #!/usr/bin/env ljwm
--- Small wmutils pfw clone using ljwm 
+-- Small wmutils pfw clone using ljwm
 
 local xcb = require("xcb.wrapper")
 local conn = xcb.connect()
