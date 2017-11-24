@@ -59,10 +59,11 @@ local enums = require("xcb.enums")
 local function handle_values(enumset, cw, values)
 	local vals = {}
 	local mask = 0
-	for _, v in ipairs(cw) do
-		if values[v] then
-			mask = mask + enumset[v:upper()]
-			table.insert(vals, values[v])
+	for i=1, #cw do -- iterate through the available flags to keep order
+		local n = cw[i]
+		if values[n] then
+			mask = mask + enumset[n:upper()]
+			table.insert(vals, tonumber(values[n]) or 0)
 		end
 	end
 	local vals_core = nil

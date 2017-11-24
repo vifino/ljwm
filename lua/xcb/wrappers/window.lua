@@ -128,6 +128,9 @@ local index = {
 		local mask, vals_core = cv.window_values(values)
 		return xcbr.xcb_change_window_attributes(self.conn, self.id, mask, vals_core)
 	end,
+
+	--- Configure window attributes.
+	-- @param values A case-sensitive (lowercase) table of parameters and values, i.e {x=0, y=0}
 	configure = function(self, values)
 		local mask, vals_core = cv.config_values(values)
 		return xcbr.xcb_configure_window(self.conn, self.id, mask, vals_core)
@@ -137,6 +140,18 @@ local index = {
 	configure_aux = function(self, values)
 		local mask, vals_core = cv.config_values(values)
 		return xcbr.xcb_configure_window(self.conn, self.id, mask, vals_core)
+	end,
+	--- Teleport a window.
+	-- @param x X coordinate
+	-- @param y Y coordinate
+	teleport = function(self, x, y)
+		return self:configure({["x"]=x, ["y"]=y})
+	end,
+	--- Resize a window.
+	-- @param w Width
+	-- @param h Height
+	resize = function(self, w, h)
+		return self:configure({width=w, height=h})
 	end,
 }
 
