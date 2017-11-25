@@ -64,7 +64,7 @@ if flags.root or (#wids == 0) then
 end
 
 local function should_list(window)
-	local attrs = window:get_attributes():reply(conn)
+	local attrs = window:get_attributes()
 
 	if flags.all then
 		return true

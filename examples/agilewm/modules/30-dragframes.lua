@@ -14,7 +14,7 @@ local function handle_lmb_motion(w, evdata)
 		createdframes[w] = {evdata.event_x - ofsx, evdata.event_y - ofsy}
 		-- Move the window
 		local fr = connection:window(w)
-		local p = fr:get_geometry():reply(connection)
+		local p = fr:get_geometry()
 		fr:configure({
 			x = p.x + ofsx,
 			y = p.y + ofsy

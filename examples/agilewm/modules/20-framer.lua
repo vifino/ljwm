@@ -23,7 +23,7 @@ local function reconfigure_frame(wrp, frame, evdata)
 	local margin = margins[frame.id]
 	if not margin then error("Somewhere, 'framer' lost track of the margin.") end
 	
-	local geom = frame:get_geometry():reply(connection)
+	local geom = frame:get_geometry()
 	local posx = evdata.values.x or geom.x
 	local posy = evdata.values.y or geom.y
 	evdata.values.x = margin.l
@@ -47,7 +47,7 @@ local function create_frame(wrp, margin, mask)
 		back_pixel = screen.white_pixel,
 		event_mask = mask
 	}
-	local geom = wrp:get_geometry():reply(connection)
+	local geom = wrp:get_geometry()
 	local tx, ty, tw, th = geom.x - margin.l, geom.y - margin.u, geom.width + (margin.l + margin.r), geom.height + (margin.u + margin.d)
 	wind:create(0, screen.root, tx, ty, tw, th, 0, xcbe.window_class.INPUT_OUTPUT, screen.root_visual, values)
 	return wind

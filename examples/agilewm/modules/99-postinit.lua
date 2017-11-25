@@ -16,7 +16,7 @@ return function (evtype, evdata, evsent)
 	if evtype == "init" then
 		for k, v in ipairs(connection:window(screen.root):children()) do
 			local w = connection:window(v)
-			local gwa = w:get_attributes():reply(connection)
+			local gwa = w:get_attributes()
 			if gwa.map_state ~= xcbe.map_state.UNMAPPED then
 				w:unmap()
 				initmaps[w.id] = true

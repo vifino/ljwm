@@ -3,7 +3,7 @@
 
 local args = {...}
 if #args ~= 3 and #args ~= 4 then
-	print("Usage: wtp [-a] <x> <y> <wid>")
+	print("Usage: wmv [-a] <x> <y> <wid>")
 	os.exit(1)
 end
 local parsed_args = {}
@@ -23,7 +23,7 @@ local xcbe = require("xcb.enums")
 local conn = xcb.connect()
 
 local win = conn:window(wid)
-local geom = win:get_geometry():reply(conn)
+local geom = win:get_geometry()
 
 -- get screen
 local setup = conn:get_setup()
