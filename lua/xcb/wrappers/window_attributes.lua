@@ -4,6 +4,8 @@ local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 
 local gwa_mt = {
+	--- Get the reply.
+	-- @param conn The xcb connection.
 	reply = function(self, conn, eptr)
 		local reply = xcbr.xcb_get_window_attributes_reply(conn, self, eptr)
 		ffi.gc(reply, ffi.C.free)
