@@ -78,19 +78,19 @@ local index = {
 
 	--- Get window attributes.
 	get_attributes = function(self)
-		return xcbr.xcb_get_window_attributes(self.conn, self.id)
+		return xcbr.xcb_get_window_attributes(self.conn, self.id):reply(self.conn)
 	end,
 	get_attributes_unchecked = function(self)
-		return xcbr.xcb_get_window_attributes_unchecked(self.conn, self.id)
+		return xcbr.xcb_get_window_attributes_unchecked(self.conn, self.id):reply(self.conn)
 	end,
 
 	--- Get window geometry.
 	-- Notably, this applies to any drawable.
 	get_geometry = function(self)
-		return xcbr.xcb_get_geometry(self.conn, self.id)
+		return xcbr.xcb_get_geometry(self.conn, self.id):reply(self.conn)
 	end,
 	get_geometry_unchecked = function(self)
-		return xcbr.xcb_get_geometry_unchecked(self.conn, self.id)
+		return xcbr.xcb_get_geometry_unchecked(self.conn, self.id):reply(self.conn)
 	end,
 
 	--- Get Children of a window.

@@ -45,10 +45,10 @@ local fns_conn = {
 
 	--- Get the input focus.
 	get_input_focus = function(self)
-		return xcbr.xcb_get_input_focus(self)
+		return xcbr.xcb_get_input_focus(self):reply(self)
 	end,
 	get_input_focus_unchecked = function(self)
-		return xcbr.xcb_get_input_focus_unchecked(self)
+		return xcbr.xcb_get_input_focus_unchecked(self):reply(self)
 	end,
 	--- Set input focus.
 	-- @param win The window to focus.
