@@ -2,7 +2,7 @@
 
 local ffi = require("ffi")
 local xcbr = require("xcb.raw")
-
+local xcbe = require("xcb.enums")
 local cv = require("xcb.wrappers.create_values")
 
 -- Helpers
@@ -82,6 +82,11 @@ local index = {
 	end,
 	get_attributes_unchecked = function(self)
 		return xcbr.xcb_get_window_attributes_unchecked(self.conn, self.id):reply(self.conn)
+	end,
+
+	--- Check if window is mapped
+	mapped = function(self)
+		return self:get_attributes().map_state == xcbe.map_state.VIEWABLE
 	end,
 
 	--- Get window geometry.
@@ -170,6 +175,8 @@ c_window = function(conn, wid)
 		else
 			error("Incompatible wrapper passed to c_window.")
 		end
+	elseif type(wid) ~= "number" then
+		error("Given WID is neither number nor window, got "..type(wid))
 	end
 	local window = {
 		["id"] = tonumber(wid),
