@@ -176,6 +176,9 @@ local function end_file()
 		end
 		enums:write("\t},\n")
 	end
+	enums:write([[
+	none = (require("ffi")).new("long int", 0),
+	]])
 	enums:write("}\n")
 	if state == "wait_for_semicolon" then
 		io.stderr:write("pulldefs.lua: Warning: stopped while waiting for a semicolon. Check state machine & tokenization logic.\n")

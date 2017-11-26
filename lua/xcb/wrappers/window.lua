@@ -166,6 +166,21 @@ local index = {
 	resize = function(self, w, h)
 		return self:configure({width=w, height=h})
 	end,
+
+	--- Get pointer information.
+	query_pointer = function(self)
+		return self.conn:query_pointer(self.id)
+	end,
+	query_pointer_unchecked = function(self)
+		return self.conn:query_pointer_unchecked(self.id)
+	end,
+
+	--- Warp the pointer relative to the window.
+	-- @param x Relative X coordinate
+	-- @param y Relative Y coordinate
+	warp_pointer = function(self, x, y)
+		return self.conn:warp_pointer(x, y, false, self)
+	end,
 }
 
 local mt = {

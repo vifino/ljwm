@@ -57,6 +57,31 @@ local fns_conn = {
 		return xcbr.xcb_set_input_focus(self, revert_to or xcbe.input_focus.NONE, win.id, xcbe.time.CURRENT_TIME)
 	end,
 
+	--- Get pointer information
+	-- @param win Window to use as reference instead of the first screen.
+	query_pointer = function(self, win)
+		local root = win and win.id or self:get_setup():setup_roots()().root
+		return xcbr.xcb_query_pointer(self, root):reply(self)
+	end,
+	query_pointer_unchecked = function(self, win)
+		local root = win and win.id or self:get_setup():setup_roots()().root
+		return xcbr.xcb_query_pointer_unchecked(self, root):reply(self)
+	end,
+
+	--- Warp the pointer.
+	-- @param x X coordinate
+	-- @param y Y coordinate
+	-- @param absolute Optionally specify whether the position is absolute instead of relative. First screen is used as reference if multiple are present.
+	-- @param win Optionally use a window as reference instead of the root window. Absolute must be falsey for it to have any effect.
+	warp_pointer = function(self, x, y, absolute, win)
+		local dst = win and win.id
+		if absolute then
+			local scr = self:get_setup():setup_roots()()
+			dst = scr.root
+		end
+		return xcbr.xcb_warp_pointer(self, xcbe.none, dst or xcbe.none, 0,0, 0,0, x,y)
+	end,
+
 	--- Wait for an event.
 	wait_for_event = function(self)
 		local event = xcbr.xcb_wait_for_event(self)

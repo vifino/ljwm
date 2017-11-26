@@ -515,4 +515,5 @@ return {
 		["ON"] = 1,
 		["OFF"] = 0,
 	},
-}
+	none = (require("ffi")).new("long int", 0),
+	}

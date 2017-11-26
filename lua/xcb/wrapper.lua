@@ -18,6 +18,7 @@ local wrappers = {
 	"event",
 	"get_input_focus",
 	"query_tree",
+	"query_pointer",
 	"iterator",
 }
 for i=1, #wrappers do
