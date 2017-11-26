@@ -38,6 +38,11 @@ local index = {
 		return xcbr.xcb_destroy_subwindows_checked(self.conn, self.id)
 	end,
 
+	--- Kill the client who owns the window this WID references.
+	kill_client = function(self)
+		return xcbr.xcb_kill_client(self.conn, self.id)
+	end,
+
 	--- Reparrent the window
 	reparent = function(self, parent, x, y)
 		return xcbr.xcb_reparent_window(self.conn, self.id, c_window(self.conn, parent).id, x, y)
