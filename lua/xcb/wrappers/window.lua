@@ -134,6 +134,9 @@ local index = {
 		local mask, vals_core = cv.window_values(values)
 		return xcbr.xcb_create_window(self.conn, depth, self.id, c_window(self.conn, parent).id, x, y, width, height, border, class, visual, mask, vals_core)
 	end,
+
+	--- Change window attributes.
+	-- @param values A case-sensitive (lowercase) table of parameters and values, i.e {x=0, y=0}
 	change = function(self, values)
 		local mask, vals_core = cv.window_values(values)
 		return xcbr.xcb_change_window_attributes(self.conn, self.id, mask, vals_core)
