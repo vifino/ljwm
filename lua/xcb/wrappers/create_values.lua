@@ -56,6 +56,16 @@ local configure_cw = {
 local ffi = require("ffi")
 local enums = require("xcb.enums")
 
+local function create_mask(enumset, elems) -- simple mask
+	local mask = 0
+	for i=1, #elems do
+		local n = tostring(elems[i]):upper()
+		local v = assert(enumset[n], "Mask value named '"..n.."' not found.")
+		mask = bit.bor(mask, v)
+	end
+	return mask
+end
+
 local function handle_values(enumset, cw, values)
 	local vals = {}
 	local mask = 0
@@ -74,13 +84,15 @@ local function handle_values(enumset, cw, values)
 end
 
 local workspace = {
-	window_values = function (values) return handle_values(enums.cw, window_cw, values) end,
-	gc_values = function (values) return handle_values(enums.gc, gc_cw, values) end,
-	config_values = function (values) return handle_values(enums.config_window, configure_cw, values) end
+	window_values = function(values) return handle_values(enums.cw, window_cw, values) end,
+	gc_values = function(values) return handle_values(enums.gc, gc_cw, values) end,
+	config_values = function(values) return handle_values(enums.config_window, configure_cw, values) end,
+	mod_masks = function(elems) return create_masks(enums.mod_mask, elems) end,
 }
 
 STP.add_known_function(workspace.window_values, "create_values.window_values")
 STP.add_known_function(workspace.gc_values, "create_values.gc_values")
 STP.add_known_function(workspace.config_values, "create_values.config_values")
+STP.add_known_function(workspace.mod_masks, "create_values.mod_masks")
 
 return workspace

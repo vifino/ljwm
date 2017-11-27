@@ -5,6 +5,7 @@ local ffi = require("ffi")
 local xcbr = require("xcb.raw")
 local xcbe = require("xcb.enums")
 
+local cv = require("xcb.wrappers.create_values")
 local c_window = require("xcb.wrappers.window")
 local c_event = require("xcb.wrappers.event")
 local c_gc = require("xcb.wrappers.gc")
@@ -100,10 +101,23 @@ local fns_conn = {
 		return
 	end,
 
+	--- Grab keyboard key(s).
+	-- @param win Window.
+	-- @param mods Array of Modifiers.
+	-- @param key Keycode of the key to grab.
+	-- @param owner_events Whether the win will still get pointer events.
+	-- @param pointer_mode_async State that the pointer processing continues normally instead of freezing all pointer events until the grab is released.
+	-- @param keyboard_mode_async State that the keyboard processing continues normally instead of freezing all keyboard events until the grab is released.
+	grab_key = function(self, win, mods, key, owner_events, pointer_mode_async, keyboard_mode_async)
+		local mod_mask = cv.mod_mask(mods)
+		return xcbr.xcb_grab_key(self, owner_events and 1 or 0, win and win.id or xcbe.none, mod_mask, key, pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync)
+	end,
+
 	--- Window object constructor for current connection.
 	window = function(self, wid)
 		return c_window(self, wid)
 	end,
+	--- GC object constructor for current connection.
 	gc = function(self, gid)
 		return c_gc(self, gid)
 	end,
