@@ -46,23 +46,17 @@ local convert_nametype = {}
 for _, v in pairs(convert_otypname) do
 	convert_nametype[v] = ffi.typeof("xcb_" .. v .. "_event_t *")
 end
-local function index(self, k)
-	if convert_nametype[k] then
-		return ffi.cast(convert_nametype[k], self.raw[0])[0]
-	end
-	return nil
-end
 
 local function c_event(ev)
+	local etype = convert_otypname[bit.band(0x7F, ev.response_type)]
 	local event = {
-		["raw"] = ffi.gc(ev, ffi.C.free),
-		["type"] = convert_otypname[bit.band(0x7F, ev.response_type)],
+		["raw"] = ev,
+		["type"] = etype,
 		["sendevent"] = (bit.band(0x80, ev.response_type) ~= 0)
 	}
-	setmetatable(event, {
-		__index = index,
-		__gc = lose_reference
-	})
+	if convert_nametype[etype] then
+		event.data = ffi.cast(convert_nametype[etype], self.raw[0])[0]
+	end
 	return event
 end
 

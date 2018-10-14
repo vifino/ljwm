@@ -72,15 +72,19 @@ local fns_conn = {
 	--- Warp the pointer.
 	-- @param x X coordinate
 	-- @param y Y coordinate
-	-- @param absolute Optionally specify whether the position is absolute instead of relative. First screen is used as reference if multiple are present.
-	-- @param win Optionally use a window as reference instead of the root window. Absolute must be falsey for it to have any effect.
-	warp_pointer = function(self, x, y, absolute, win)
+	-- @param relative Optionally specify whether the position is relative instead of absolute. First screen is used as reference if multiple are present.
+	-- @param win Optionally use a window as reference instead of the root window. Must be relative for it to have any effect.
+	warp_pointer = function(self, x, y, relative, win)
+		if relative then
+			return xcbr.xcb_warp_pointer(self, xcbe.none, xcbe.none, 0,0, 0,0, x,y)
+		end
+
 		local dst = win and win.id
-		if absolute then
+		if not dst then
 			local scr = self:get_setup():setup_roots()()
 			dst = scr.root
 		end
-		return xcbr.xcb_warp_pointer(self, xcbe.none, dst or xcbe.none, 0,0, 0,0, x,y)
+		return xcbr.xcb_warp_pointer(self, xcbe.none, dst, 0,0, 0,0, x,y)
 	end,
 
 	--- Wait for an event.
@@ -103,14 +107,60 @@ local fns_conn = {
 
 	--- Grab keyboard key(s).
 	-- @param win Window.
+	-- @param owner_events Whether the win will still get pointer events.
 	-- @param mods Array of Modifiers.
 	-- @param key Keycode of the key to grab.
-	-- @param owner_events Whether the win will still get pointer events.
 	-- @param pointer_mode_async State that the pointer processing continues normally instead of freezing all pointer events until the grab is released.
 	-- @param keyboard_mode_async State that the keyboard processing continues normally instead of freezing all keyboard events until the grab is released.
-	grab_key = function(self, win, mods, key, owner_events, pointer_mode_async, keyboard_mode_async)
-		local mod_mask = cv.mod_mask(mods)
-		return xcbr.xcb_grab_key(self, owner_events and 1 or 0, win and win.id or xcbe.none, mod_mask, key, pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync)
+	grab_key = function(self, win, owner_events, mods, key, pointer_mode_async, keyboard_mode_async)
+		local mod_mask = cv.mod_masks(mods)
+		key = key or 0
+		return xcbr.xcb_grab_key(self, owner_events and 1 or 0, win and win.id or xcbe.none, mod_mask, ffi.cast('unsigned char', key), pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync)
+	end,
+
+	--- Grab button(s).
+	-- @param win Window.
+	-- @param owner_events Whether the win will still get pointer events.
+	-- @param events Array of events.
+	-- @param pointer_mode_async State that the pointer processing continues normally instead of freezing all pointer events until the grab is released.
+	-- @param keyboard_mode_async State that the keyboard processing continues normally instead of freezing all keyboard events until the grab is released.
+	-- @param confine_to window to confine grabbing to.
+	-- @param cursor cursor to select or nil to keep current.
+	-- @param button Keycode of the button to grab.
+	-- @param mods Array of Modifiers.
+	grab_button = function(self, win, owner_events, events, pointer_mode_mode_async, keyboard_mode_async, confine_to, cursor, button, mods)
+		local event_mask = cv.event_masks(events)
+		local mod_mask = cv.mod_masks(mods)
+		return xcbr.xcb_grab_button(self, owner_events and 1 or 0, win and win.id or xcbe.none, event_mask, key or 0, pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, confine_to and confine_to.id or xcbe_none, cursor or xcbe.none, button or xcbe.button_index.any, mod_mask)
+	end,
+
+	--- Grab pointer.
+	-- @param win Window.
+	-- @param owner_events Whether the win will still get pointer events.
+	-- @param events Array of events.
+	-- @param pointer_mode_async State that the pointer processing continues normally instead of freezing all pointer events until the grab is released.
+	-- @param keyboard_mode_async State that the keyboard processing continues normally instead of freezing all keyboard events until the grab is released.
+	-- @param confine_to Optional window to confine grabbing to.
+	-- @param cursor Optional cursor select.
+	-- @param timestamp Optional Timestamp.
+	grab_pointer = function(self, win, owner_events, events, pointer_mode_mode_async, keyboard_mode_async, confine_to, cursor, timestamp)
+		local event_mask = cv.event_masks(events)
+		return xcbr.xcb_grab_pointer(self, owner_events and 1 or 0, win and win.id or xcbe.none, event_mask, key or 0, pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, confine_to and confine_to.id or xcbe_none, cursor or xcbe.none, timestamp or xcbe.time.CURRENT_TIME)
+	end,
+
+	--- Ungrab key.
+	-- @param win Window.
+	-- @param key Keycode of the combination or falsey to release all.
+	-- @param mods Array of modifiers or falsey to match all.
+	ungrab_key = function(self, win, key, mods)
+		local mod_mask = mods and cv.mod_masks(mods) or xcbe.mod_mask.ANY
+		return xcbr.xcb_ungrab_pointer(self, key or xcbe.grab.ANY, win and win.id, mod_mask)
+	end,
+
+	--- Ungrab pointer.
+	-- @param timestamp Optional Timestamp.
+	ungrab_pointer = function(self, timestamp)
+		return xcbr.xcb_ungrab_pointer(self, timestamp or xcbe.time.CURRENT_TIME)
 	end,
 
 	--- Window object constructor for current connection.

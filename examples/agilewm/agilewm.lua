@@ -42,7 +42,7 @@ local function pre_transform_event(ev)
 			parent = evcr.parent,
 			values = vl}, ev.sendevent
 	end
-	return ev.type, ev[ev.type], ev.sendevent
+	return ev.type, ev.data, ev.sendevent
 end
 local function post_transform_event(evtype, evdata, evsent)
 	if evtype == "configure_request" then
