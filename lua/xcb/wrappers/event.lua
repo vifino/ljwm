@@ -55,7 +55,7 @@ local function c_event(ev)
 		["sendevent"] = (bit.band(0x80, ev.response_type) ~= 0)
 	}
 	if convert_nametype[etype] then
-		event.data = ffi.cast(convert_nametype[etype], self.raw[0])[0]
+		event.data = ffi.cast(convert_nametype[etype], ev[0])[0]
 	end
 	return event
 end
