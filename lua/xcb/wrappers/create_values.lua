@@ -87,7 +87,8 @@ local workspace = {
 	window_values = function(values) return handle_values(enums.cw, window_cw, values) end,
 	gc_values = function(values) return handle_values(enums.gc, gc_cw, values) end,
 	config_values = function(values) return handle_values(enums.config_window, configure_cw, values) end,
-	mod_masks = function(elems) return create_masks(enums.mod_mask, elems) end,
+	mod_masks = function(elems) return create_mask(enums.mod_mask, elems) end,
+	event_masks = function(elems) return create_mask(enums.event_mask, elems) end,
 }
 
 STP.add_known_function(workspace.window_values, "create_values.window_values")

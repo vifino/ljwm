@@ -97,7 +97,7 @@ while true do
 	local ev = conn:poll_for_event()
 	if ev then
 		if ev.type == "expose" then
-			local expose = ev.expose
+			local expose = ev.data
 			if expose.window == wind.id then
 				print("Exposed, " .. expose.x .. " " .. expose.y .. " / " .. expose.width .. "x" .. expose.height)
 				redraw(256)

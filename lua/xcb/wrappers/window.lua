@@ -179,7 +179,7 @@ local index = {
 	-- @param x Relative X coordinate
 	-- @param y Relative Y coordinate
 	warp_pointer = function(self, x, y)
-		return self.conn:warp_pointer(x, y, false, self)
+		return self.conn:warp_pointer(x, y, true, self)
 	end,
 }
 
