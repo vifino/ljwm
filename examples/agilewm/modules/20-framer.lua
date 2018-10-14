@@ -17,12 +17,62 @@ local aframe = {}
 local frames = {}
 local margins = {}
 
+local function change_frame(wrp, framex, framey, framew, frameh, wcoords, manual_internal_reconfig)
+	local frame = frames[wrp.id]
+	if not frame then return end
+
+	local margin = margins[frame.id]
+	if not margin then error("Somewhere, 'framer' lost track of the margin.") end
+
+	local windowx = framex
+	local windowy = framey
+	local windoww = framew
+	local windowh = frameh
+	if wcoords then
+		-- Window coordinates, alter frame
+		framex = framex - margin.l
+		framey = framey - margin.u
+		framew = framew + (margin.l + margin.r)
+		frameh = frameh + (margin.u + margin.d)
+	else
+		-- Frame coordinates, alter window
+		windowx = windowx + margin.l
+		windowy = windowy + margin.u
+		windoww = windoww - (margin.l + margin.r)
+		windowh = windowh - (margin.u + margin.d)
+	end
+
+	-- Frame configuration
+	local rcfg = {
+		x = framex,
+		y = framey,
+		width = framew,
+		height = frameh
+	}
+	frame:configure(rcfg)
+
+	-- Notably, the reconfiguration cannot be stopped or altered,
+	-- this just alerts modules which have their stuff on a frame.
+	submit_ev("framer.config", {window = wrp.id, frame = frame.id, geom = rcfg}, false)
+
+	if manual_internal_reconfig then return end
+
+	-- Window configuration
+	local rcfgw = {
+		x = margin.l,
+		y = margin.u,
+		width = windoww,
+		height = windowh
+	}
+	wrp:configure(rcfgw)
+end
+
 -- For some reason, windows reconfigure in screen coordinates,
 -- BUT still respect the fact they're being reparented when specifying them?
 local function reconfigure_frame(wrp, frame, evdata)
 	local margin = margins[frame.id]
 	if not margin then error("Somewhere, 'framer' lost track of the margin.") end
-	
+
 	local geom = frame:get_geometry()
 	local posx = evdata.values.x or geom.x
 	local posy = evdata.values.y or geom.y
@@ -32,21 +82,16 @@ local function reconfigure_frame(wrp, frame, evdata)
 	evdata.values.border_width = 0
 	local w = evdata.values.width or (geom.width - (margin.l + margin.r))
 	local h = evdata.values.height or (geom.height - (margin.u + margin.d))
-	local rcfg = {x = posx,
-		y = posy,
-		width = w + (margin.l + margin.r),
-		height = h + (margin.u + margin.d)}
-	frame:configure(rcfg)
-	-- Notably, the reconfiguration cannot be stopped or altered,
-	-- this just alerts modules which have their stuff on a frame.
-	submit_ev("framer.config", {window = wrp.id, frame = frame.id, geom = rcfg}, false)
+
+	change_frame(wrp, posx, posy, w, h, true, true)
 end
-local function create_frame(wrp, margin, mask)
+local function create_frame(wrp, rd)
 	local wind = connection:window(connection:generate_id())
 	local values = {
-		back_pixel = screen.white_pixel,
-		event_mask = mask
+		back_pixel = rd.back_pixel,
+		event_mask = rd.event_mask
 	}
+	local margin = rd.margin
 	local geom = wrp:get_geometry()
 	local tx, ty, tw, th = geom.x - margin.l, geom.y - margin.u, geom.width + (margin.l + margin.r), geom.height + (margin.u + margin.d)
 	wind:create(0, screen.root, tx, ty, tw, th, 0, xcbe.window_class.INPUT_OUTPUT, screen.root_visual, values)
@@ -63,6 +108,7 @@ local function precreate_frame(wid, consultant)
 	-- since that is probably a bad idea and shouldn't work.
 	local redirection = {window = wid,
 		margin = {l = 0, u = 0, r = 0, d = 0},
+		back_pixel = screen.white_pixel,
 		event_mask =
 		xcbe.event_mask.STRUCTURE_NOTIFY +
 		xcbe.event_mask.SUBSTRUCTURE_NOTIFY +
@@ -83,7 +129,7 @@ local function precreate_frame(wid, consultant)
 	--  a frame has to be created.
 	-- (And then that frame mapped instead.)
 	local wrp = connection:window(wid)
-	local frame = create_frame(wrp, redirection.margin, redirection.event_mask)
+	local frame = create_frame(wrp, redirection)
 	wrp:reparent(frame, redirection.margin.l, redirection.margin.u)
 	wrp:configure({border_width = 0})
 	wrp:map()
@@ -104,18 +150,20 @@ end
 local function destroy_frame(wid)
 	if frames[wid] then
 		local frame = frames[wid]
-		submit_ev("framer.destroy", {window = wid, frame = frame}, false)
+		submit_ev("framer.destroy", {window = wid, frame = frame.id}, false)
 		aframe[frame.id] = nil
 		margins[frame.id] = nil
 		frame:destroy()
 		frames[wid] = nil
 	end
 end
+
 -- API stuff --
 
 framer = {}
 framer.precreate_frame = precreate_frame
 framer.destroy_frame = destroy_frame
+framer.change_frame = change_frame
 
 local function map_request(w)
 	if aframe[w] then

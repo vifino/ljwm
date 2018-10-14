@@ -28,7 +28,7 @@ local function pre_transform_event(ev)
 		-- A window wants to be configured,
 		--  let's make that happen!
 		local vl = {}
-		local evcr = ev.configure_request
+		local evcr = ev.data
 		local vm = evcr.value_mask
 		vl.x = configure_request_svh(evcr.x, vm, xcbe.config_window.X)
 		vl.y = configure_request_svh(evcr.y, vm, xcbe.config_window.Y)
@@ -42,7 +42,7 @@ local function pre_transform_event(ev)
 			parent = evcr.parent,
 			values = vl}, ev.sendevent
 	end
-	return ev.type, ev[ev.type], ev.sendevent
+	return ev.type, ev.data, ev.sendevent
 end
 local function post_transform_event(evtype, evdata, evsent)
 	if evtype == "configure_request" then
@@ -188,9 +188,21 @@ local function distribute_event(evtype, evdata, evsent)
 	conn:flush()
 end
 
--- Kickstart modules.
+-- Kickstart modules, and perform root reconfiguration
 
-distribute_event("init", {}, true)
+for k, v in pairs(screens) do
+	local initdata = {
+		root_configure = {
+			event_mask = 
+			xcbe.event_mask.STRUCTURE_NOTIFY +
+			xcbe.event_mask.SUBSTRUCTURE_NOTIFY +
+			xcbe.event_mask.SUBSTRUCTURE_REDIRECT
+		}
+	}
+	v.submit_ev("init", initdata, true)
+	conn:window(v.screen.root):change(initdata.root_configure)
+	conn:flush()
+end
 
 -- The main event loop.
 

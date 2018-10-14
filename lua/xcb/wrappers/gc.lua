@@ -59,6 +59,10 @@ local index = {
 	poly_fill_arc = generate_standard_poly_function("xcb_arc_t", "xcb_poly_fill_arc", false),
 	poly_fill_arc = generate_standard_poly_function("xcb_arc_t", "xcb_poly_fill_arc_checked", false),
 
+	image_text_8 = function (self, window, x, y, text)
+		return xcbr.xcb_image_text_8(self.conn, math.min(#text, 255), drawable(window), self.id, x, y, text)
+	end,
+
 	create = function(self, window, values)
 		local mask, vals_core = cv.gc_values(values)
 		return xcbr.xcb_create_gc(self.conn, self.id, drawable(window), mask, vals_core)
@@ -67,6 +71,9 @@ local index = {
 		local mask, vals_core = cv.gc_values(values)
 		return xcbr.xcb_change_gc(self.conn, self.id, mask, vals_core)
 	end,
+	free = function(self)
+		return xcbr.xcb_free_gc(self.conn, self.id)
+	end
 }
 
 local mt = {

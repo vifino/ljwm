@@ -4,50 +4,45 @@
 local precreated = {}
 local createdframes = {}
 
-local function handle_lmb_motion(w, evdata)
-	if createdframes[w] == true then
-		createdframes[w] = {evdata.event_x, evdata.event_y}
-		return
-	else
-		local ofsx = evdata.event_x - createdframes[w][1]
-		local ofsy = evdata.event_y - createdframes[w][2]
-		createdframes[w] = {evdata.event_x - ofsx, evdata.event_y - ofsy}
-		-- Move the window
-		local fr = connection:window(w)
-		local p = fr:get_geometry()
-		fr:configure({
-			x = p.x + ofsx,
-			y = p.y + ofsy
-		})
-	end
-end
-
 return function(evtype, evdata, evsent)
 	if evtype == "framer.precreate" then
 		precreated[evdata.window] = true
-		evdata.event_mask = bit.bor(evdata.event_mask, xcbe.event_mask.BUTTON_1_MOTION)
+		evdata.event_mask = bit.bor(evdata.event_mask, xcbe.event_mask.BUTTON_PRESS)
 		evdata.margin.l = math.max(evdata.margin.l, 4)
-		evdata.margin.u = math.max(evdata.margin.u, 32)
+		evdata.margin.u = math.max(evdata.margin.u, 4)
 		evdata.margin.r = math.max(evdata.margin.r, 4)
 		evdata.margin.d = math.max(evdata.margin.d, 4)
-	end
-	if evtype == "framer.precreate.cancel" then
+	elseif evtype == "framer.precreate.cancel" then
 		precreated[evdata.window] = nil
-	end
-	if evtype == "framer.create" then
+	elseif evtype == "framer.create" then
 		if precreated[evdata.window] then
-			createdframes[evdata.frame] = true
+			createdframes[evdata.frame] = evdata.window
 		end
 		precreated[evdata.window] = nil
-	end
-	if evtype == "framer.destroy" then
+	elseif evtype == "framer.destroy" then
 		createdframes[evdata.frame] = nil
-	end
-	if evtype == "motion_notify" then
+	elseif evtype == "button_press" then
 		if createdframes[evdata.event] then
 			if evdata.child == 0 then
-				if bit.band(evdata.state, xcbe.button_mask["1"]) ~= 0 then
-					handle_lmb_motion(evdata.event, evdata)
+				if evdata.detail == 1 or evdata.detail == 3 then
+					local detail = evdata.detail
+					local fr = connection:window(evdata.event)
+					local wid = connection:window(createdframes[evdata.event])
+					fr:configure({stack_mode = xcbe.stack_mode.ABOVE})
+					local ox, oy = evdata.root_x, evdata.root_y
+					local p = fr:get_geometry()
+					local px, py, pw, ph = p.x, p.y, p.width, p.height
+					grabber(function (x, y)
+						if detail == 1 then
+							fr:configure({
+								x = px + x - ox,
+								y = py + y - oy
+							})
+						else
+							framer.change_frame(wid, p.x, p.y, pw + x - ox, ph + y - oy, false, false)
+						end
+					end)
+					return true
 				end
 			end
 		end
