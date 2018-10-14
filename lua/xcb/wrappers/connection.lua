@@ -115,7 +115,10 @@ local fns_conn = {
 	grab_key = function(self, win, owner_events, mods, key, pointer_mode_async, keyboard_mode_async)
 		local mod_mask = cv.mod_masks(mods)
 		key = key or 0
-		return xcbr.xcb_grab_key(self, owner_events and 1 or 0, win and win.id or xcbe.none, mod_mask, ffi.cast('unsigned char', key), pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync)
+		key = ffi.cast('unsigned char', key)
+		local pma = pointer_mode_async and xcbe.grab_mode.ASYNC or xcbe.grab_mode.SYNC
+		local kma = keyboard_mode_async and xcbe.grab_mode.ASYNC or xcbe.grab_mode.SYNC
+		return xcbr.xcb_grab_key(self, owner_events and 1 or 0, win and win.id or xcbe.none, mod_mask, key, pma, kma)
 	end,
 
 	--- Grab button(s).
@@ -128,10 +131,12 @@ local fns_conn = {
 	-- @param cursor cursor to select or nil to keep current.
 	-- @param button Keycode of the button to grab.
 	-- @param mods Array of Modifiers.
-	grab_button = function(self, win, owner_events, events, pointer_mode_mode_async, keyboard_mode_async, confine_to, cursor, button, mods)
+	grab_button = function(self, win, owner_events, events, pointer_mode_async, keyboard_mode_async, confine_to, cursor, button, mods)
 		local event_mask = cv.event_masks(events)
 		local mod_mask = cv.mod_masks(mods)
-		return xcbr.xcb_grab_button(self, owner_events and 1 or 0, win and win.id or xcbe.none, event_mask, key or 0, pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, confine_to and confine_to.id or xcbe_none, cursor or xcbe.none, button or xcbe.button_index.any, mod_mask)
+		local pma = pointer_mode_async and xcbe.grab_mode.ASYNC or xcbe.grab_mode.SYNC
+		local kma = keyboard_mode_async and xcbe.grab_mode.ASYNC or xcbe.grab_mode.SYNC
+		return xcbr.xcb_grab_button(self, owner_events and 1 or 0, win and win.id or xcbe.none, event_mask, pma, kma, confine_to and confine_to.id or xcbe_none, cursor or xcbe.none, button or xcbe.button_index.ANY, mod_mask)
 	end,
 
 	--- Grab pointer.
@@ -143,9 +148,11 @@ local fns_conn = {
 	-- @param confine_to Optional window to confine grabbing to.
 	-- @param cursor Optional cursor select.
 	-- @param timestamp Optional Timestamp.
-	grab_pointer = function(self, win, owner_events, events, pointer_mode_mode_async, keyboard_mode_async, confine_to, cursor, timestamp)
+	grab_pointer = function(self, win, owner_events, events, pointer_mode_async, keyboard_mode_async, confine_to, cursor, timestamp)
 		local event_mask = cv.event_masks(events)
-		return xcbr.xcb_grab_pointer(self, owner_events and 1 or 0, win and win.id or xcbe.none, event_mask, key or 0, pointer_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, keyboard_mode_async and xcbe.grab_mode.async or xcbe.grab_mode.sync, confine_to and confine_to.id or xcbe_none, cursor or xcbe.none, timestamp or xcbe.time.CURRENT_TIME)
+		local pma = pointer_mode_async and xcbe.grab_mode.ASYNC or xcbe.grab_mode.SYNC
+		local kma = keyboard_mode_async and xcbe.grab_mode.ASYNC or xcbe.grab_mode.SYNC
+		return xcbr.xcb_grab_pointer(self, owner_events and 1 or 0, win and win.id or xcbe.none, event_mask, pma, kma, confine_to and confine_to.id or xcbe_none, cursor or xcbe.none, timestamp or xcbe.time.CURRENT_TIME)
 	end,
 
 	--- Ungrab key.
@@ -154,7 +161,7 @@ local fns_conn = {
 	-- @param mods Array of modifiers or falsey to match all.
 	ungrab_key = function(self, win, key, mods)
 		local mod_mask = mods and cv.mod_masks(mods) or xcbe.mod_mask.ANY
-		return xcbr.xcb_ungrab_pointer(self, key or xcbe.grab.ANY, win and win.id, mod_mask)
+		return xcbr.xcb_ungrab_key(self, key or xcbe.grab.ANY, win and win.id, mod_mask)
 	end,
 
 	--- Ungrab pointer.

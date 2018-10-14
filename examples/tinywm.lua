@@ -8,9 +8,9 @@ local conn = xcb.connect()
 local screen = conn:get_setup():setup_roots()()
 local root = conn:window(screen.root)
 
-conn:grab_key(root, true, {"2"}, false, false, true, true)
-conn:grab_button(root, false, {xcbe.event_mask.BUTTON_PRESS, xcbe.event_mask.BUTTON_RELEASE}, true, true, root, false, 1, {"1"})
-conn:grab_button(root, false, {xcbe.event_mask.BUTTON_PRESS, xcbe.event_mask.BUTTON_RELEASE}, true, true, root, false, 3, {"1"})
+conn:grab_key(root, true, {"2"}, false, true, true)
+conn:grab_button(root, false, {"BUTTON_PRESS", "BUTTON_RELEASE"}, true, true, root, false, 1, {"1"})
+conn:grab_button(root, false, {"BUTTON_PRESS", "BUTTON_RELEASE"}, true, true, root, false, 3, {"1"})
 
 conn:flush()
 
@@ -31,8 +31,9 @@ while true do
 			mt = 3
 			ew:warp_pointer(geom.width, geom.height)
 		end
-		conn:grab_pointer(root, false, {xcbe.event_mask.BUTTON_RELEASE, xcbe.event_mask.BUTTON_MOTION, xcbe.event_mask.POINTER_MOTION_HINT}, true, true, root)
+		conn:grab_pointer(root, false, {"BUTTON_RELEASE", "BUTTON_MOTION", "POINTER_MOTION_HINT"}, true, true, root)
 		conn:flush()
+		print("pointer grabbed")
 	elseif ev.type == "motion_notify" then
 		local ptr = conn:query_pointer(root)
 		local geom = ew:get_geometry()
@@ -41,7 +42,7 @@ while true do
 			w = screen.width_in_pixels - geom.width
 		end
 		if ptr.root_y + geom.height > screen.height_in_pixels then
-			w = screen.height_in_pixels - geom.height
+			h = screen.height_in_pixels - geom.height
 		end
 
 		if mt == 1 then
@@ -56,8 +57,10 @@ while true do
 			})
 		end
 		conn:flush()
+		print("motion notify in mode " .. mt)
 	elseif ev.type == "button_release" then
 		conn:ungrab_pointer()
 		conn:flush()
+		print("pointer ungrabbed")
 	end
 end
